@@ -43,7 +43,7 @@ public class Tile {
        Location basis = new Location(FTG.world,153D,5D,32D);
        int temp =0;
        for (int x = -RADIUS;x<=RADIUS;x++){
-           for (int z = -RADIUS/2-temp;temp+RADIUS/2>z;z++){
+           for (int z = -RADIUS/2-temp;z<=temp+RADIUS/2;z++){
                if(x<0) temp++;
                else temp--;
                TileSet.add(new Tile(basis.clone().add(x*14,0,z*14)));

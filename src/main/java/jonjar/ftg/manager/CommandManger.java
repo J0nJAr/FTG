@@ -1,6 +1,11 @@
 package jonjar.ftg.manager;
 
+import jonjar.ftg.FTG;
+import jonjar.ftg.entity.Tile;
 import jonjar.ftg.util.MsgSender;
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.block.Block;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -38,16 +43,48 @@ public class CommandManger extends MsgSender implements CommandExecutor {
         else if(args[0].equalsIgnoreCase("observer"))
             observer(p);
         else if(args[0].equalsIgnoreCase("debug"))
-            debug(p);
+            debug(p,args);
         else
             help(p);
         
         return true;
     }
-    
+
+
     private void start(Player p){
-        
+
     }
+    private void stop(Player p) {
+    }
+
+    private void pause(Player p) {
+    }
+
+    private void team(Player p) {
+    }
+
+    private void observer(Player p) {
+    }
+
+    private void debug(Player p, String[] args) {
+
+        if(args.length>0){
+            switch (args[1]){
+                case "setTile":
+                    for (Tile tile: Tile.TileSet) {
+                        for(Block bl:tile.getBlocks()){
+                            bl.setType(Material.WHITE_CONCRETE);
+                        }
+                    }
+                case "register":
+                    Tile.registerTiles();
+                    msg(p, "등록함");
+            }
+        }
+    }
+
+
+
 
     private void help(Player p){
         msg(p, "§a/ftg start §f게임을 시작합니다.");

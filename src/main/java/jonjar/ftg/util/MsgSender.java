@@ -13,8 +13,7 @@ public class MsgSender {
         sender.sendMessage("§c[FTG] " + msg);
     }
 
-    public void broadcast(CommandSender sender, String msg){
-        sender.sendMessage("§e[FTG] ");
-
+    public void broadcast(String msg){
+        Bukkit.broadcastMessage("§e[FTG] §f" + msg);
     }
 }

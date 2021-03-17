@@ -14,7 +14,8 @@ public class GameManager extends MsgSender {
         this.plugin = main;
     }
 
-    private int elapsed_tick;
+    private int elapsed_sec;
+    public static boolean PAUSE = false;
 
     private GameManagerTask runnable;
 
@@ -30,18 +31,57 @@ public class GameManager extends MsgSender {
             reset();
             runnable = new GameManagerTask();
             runnable.runTaskTimer(plugin, 0L, 20L);
+            broadcast("§f§l" + p.getName() + "님께서 게임을 시작하셨습니다!");
         }
     }
 
+    public void stop(Player p){
+        if(runnable != null && runnable.isCancelled()){
+            error(p, "게임이 종료되어있습니다.");
+        } else {
+
+        }
+    }
+    
+    public void pause(Player p){
+        if(runnable == null || runnable.isCancelled())
+            error(p, "§c게임이 시작되어있지 않습니다.");
+        else {
+            PAUSE = !PAUSE;
+            broadcast(PAUSE ? "§c§l" + p.getName() + "님께서 게임을 일시정지하셨습니다." : "§f§l" + p.getName() + "님께서 게임을 재개하셨습니다!");
+        }
+    }
+
+    private boolean checkTeam(){
+
+        for(Player ap : Bukkit.getOnlinePlayers()){
+            PlayerInfo pi = PlayerInfo.getPlayerInfo(ap);
+            if(pi.getTeam() == null && !pi.isObserver())
+                return false;
+        }
+
+        return true;
+    }
+    
+    
+
     private void reset(){
-        elapsed_tick = 0;
+        this.elapsed_sec = 0;
     }
 
 
     public class GameManagerTask extends BukkitRunnable {
 
         public void run(){
+            
+            if(PAUSE)
+                return;
+            
+            switch(elapsed_sec){
+                case 1:
 
+                    break;
+            }
         }
 
     }
