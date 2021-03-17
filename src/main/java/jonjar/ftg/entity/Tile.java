@@ -1,8 +1,7 @@
-package jonjar.ftg;
+package jonjar.ftg.entity;
 
 import org.bukkit.Location;
 
-import java.util.HashMap;
 import java.util.HashSet;
 
 public class Tile {
