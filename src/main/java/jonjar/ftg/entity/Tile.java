@@ -1,6 +1,7 @@
 package jonjar.ftg.entity;
 
 import jonjar.ftg.FTG;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -40,14 +41,18 @@ public class Tile {
 
 
     public static void registerTiles(){
-       Location basis = new Location(FTG.world,153D,5D,32D);
+
        int temp =0;
        for (int x = -RADIUS;x<=RADIUS;x++){
+
+
            for (int z = -RADIUS/2-temp;z<=temp+RADIUS/2;z++){
-               if(x<0) temp++;
-               else temp--;
-               TileSet.add(new Tile(basis.clone().add(x*14,0,z*14)));
+               Bukkit.broadcastMessage(x+"   "+z);
+
+               TileSet.add(new Tile((new Location(FTG.world,153D,5D,32D)).add(x*14,0,z*14)));
            }
+           if(x<0) temp++;
+           else temp--;
         }
        //while (FTG.tileMaterial.contains(current.getBlock().getType()==Material.GRAY_CONCRETE));
 
