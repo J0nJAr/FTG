@@ -9,8 +9,8 @@ public final class FTG extends JavaPlugin {
     @Override
     public void onEnable() {
         // Plugin startup logic
-        getCommand("FTG").setExecutor(cm);
-        getCommand("FTG").tabComplete(new TabCompleteManager());
+        getCommand("ftg").setExecutor(cm);
+        getCommand("ftg").tabComplete(new TabCompleteManager());
     }
 
     @Override
