@@ -1,4 +1,4 @@
-package jonjar.ftg.uitilities;
+package jonjar.ftg.util;
 
 import org.bukkit.Location;
 import org.bukkit.entity.Entity;
