@@ -46,7 +46,7 @@ public class CommandManger extends MsgSender implements CommandExecutor {
     }
     
     private void start(Player p){
-        
+        GamE
     }
 
     private void help(Player p){
