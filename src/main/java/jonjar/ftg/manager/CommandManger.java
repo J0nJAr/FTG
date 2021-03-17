@@ -43,16 +43,15 @@ public class CommandManger extends MsgSender implements CommandExecutor {
         else if(args[0].equalsIgnoreCase("observer"))
             observer(p);
         else if(args[0].equalsIgnoreCase("debug"))
-            debug(p,args);
+            debug(p);
         else
             help(p);
         
         return true;
     }
-
-
+    
     private void start(Player p){
-
+        
     }
     private void stop(Player p) {
     }
