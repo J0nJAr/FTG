@@ -43,7 +43,7 @@ public class CommandManger extends MsgSender implements CommandExecutor {
         else if(args[0].equalsIgnoreCase("observer"))
             observer(p);
         else if(args[0].equalsIgnoreCase("debug"))
-            debug(p);
+            debug(p,args);
         else
             help(p);
         
