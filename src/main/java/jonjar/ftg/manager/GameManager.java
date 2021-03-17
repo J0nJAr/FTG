@@ -1,7 +1,9 @@
 package jonjar.ftg.manager;
 
 import jonjar.ftg.FTG;
+import jonjar.ftg.entity.PlayerInfo;
 import jonjar.ftg.util.MsgSender;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 

@@ -1,5 +1,6 @@
 package jonjar.ftg.util;
 
+import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 
 public class MsgSender {
