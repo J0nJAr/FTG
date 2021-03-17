@@ -1,0 +1,9 @@
+name: FTG
+version: @version@
+main: jonjar.ftg.FTG
+api-version: 1.16
+authors: [ Kimbepo, macham ]
+description: 땅따먹기
+commands:
+  FTG:
+    aliases: ftg
