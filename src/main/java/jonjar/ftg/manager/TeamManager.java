@@ -88,7 +88,7 @@ public class TeamManager extends MsgSender{
         } else {
             msg(p, "현재 팀 목록 : ");
             for(Team t : Team.getTeams()){
-                msg(p, t.getColor() + t.getColor().name() + " §7[" + t.getTeam().getEntries().size() + "명]");
+                msg(p, t.getColor().getChatColor() + t.getColor().name() + " §7[" + t.getTeam().getEntries().size() + "명]");
             }
         }
     }

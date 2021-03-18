@@ -14,10 +14,20 @@ public class GameManager extends MsgSender {
         this.plugin = main;
     }
 
+    public enum GameState {
+        WAIT,
+        READY,
+        START,
+        END;
+    }
+
+    public static GameState STATE = GameState.WAIT;
+
     private int elapsed_sec;
     public static boolean PAUSE = false;
 
     private GameManagerTask runnable;
+
 
     /*
     1. 관리자가 team 명령어를 통해 팀 배분 시켰는지 확인
@@ -33,6 +43,7 @@ public class GameManager extends MsgSender {
                 runnable = new GameManagerTask();
                 runnable.runTaskTimer(plugin, 0L, 20L);
                 broadcast("§f§l" + p.getName() + "님께서 게임을 시작하셨습니다!");
+                STATE = GameState.READY;
             } else {
                 error(p, "§c팀 배분을 받지 못한 플레이어가 있습니다.");
             }
@@ -42,7 +53,7 @@ public class GameManager extends MsgSender {
 
     public void stop(Player p){
         if(runnable == null || runnable.isCancelled()){
-            error(p, "게임이 종료되어있습니다.");
+            error(p, "이미 게임이 종료되어있습니다.");
         } else {
             runnable.cancel();
             runnable = null;
@@ -95,7 +106,7 @@ public class GameManager extends MsgSender {
             
             switch(elapsed_sec){
                 case 1:
-                    
+
                     break;
             }
         }

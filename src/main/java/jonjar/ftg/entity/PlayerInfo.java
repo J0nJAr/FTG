@@ -1,6 +1,12 @@
 package jonjar.ftg.entity;
 
+import org.bukkit.Bukkit;
+import org.bukkit.GameMode;
+import org.bukkit.Material;
+import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 
 import java.lang.reflect.Array;
 import java.util.ArrayList;
@@ -54,6 +60,35 @@ public class PlayerInfo {
             leaveTeam();
         team.addPlayer(uuid);
         this.team = team;
+    }
+
+    public void equipKits(boolean reset){
+        if(this.team == null || Bukkit.getPlayer(uuid) == null) return;
+
+        Player p = Bukkit.getPlayer(uuid);
+        if(reset){
+            p.getInventory().clear();
+            p.setGameMode(GameMode.ADVENTURE);
+            p.setHealth(20.0D);
+        }
+
+        p.getInventory().addItem(new ItemStack(Material.WOOD_SWORD));
+        p.getInventory().setArmorContents(team.getArmors());
+        p.updateInventory();
+    }
+
+    public void teleportBase(){
+        if(this.team == null || Bukkit.getPlayer(uuid) == null) return;
+    }
+
+    private final static ItemStack KIT_SWORD;
+
+    static {
+        KIT_SWORD = new ItemStack(Material.WOOD_SWORD);
+        ItemMeta ism = KIT_SWORD.getItemMeta();
+        ism.setUnbreakable(true);
+        KIT_SWORD.setItemMeta(ism);
+        KIT_SWORD.addUnsafeEnchantment(Enchantment.DAMAGE_ALL, 1);
     }
 
 }

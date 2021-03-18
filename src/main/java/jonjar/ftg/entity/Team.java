@@ -1,7 +1,10 @@
 package jonjar.ftg.entity;
 
 import org.bukkit.ChatColor;
+import org.bukkit.Color;
 import org.bukkit.Material;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.LeatherArmorMeta;
 import org.bukkit.scoreboard.Scoreboard;
 
 import java.util.ArrayList;
@@ -45,6 +48,7 @@ public class Team {
 
 
     private final TeamColor tc;
+    private final ItemStack[] armors;
 
     private org.bukkit.scoreboard.Team team;
 
@@ -52,9 +56,22 @@ public class Team {
 
     public Team(TeamColor tc){
         this.tc = tc;
+
+        armors = new ItemStack[4];
+        armors[0] = color(Material.LEATHER_HELMET);
+        armors[1] = color(Material.LEATHER_CHESTPLATE);
+        armors[2] = color(Material.LEATHER_LEGGINGS);
+        armors[3] = color(Material.LEATHER_BOOTS);
+
         TeamList.add(this);
     }
 
+    public ItemStack[] getArmors() {
+        ItemStack[] clone = new ItemStack[4];
+        for(int i=0;i<4;i++)
+            clone[i] = armors[i].clone();
+        return clone;
+    }
     public TeamColor getColor() { return this.tc; }
     public List<Tile> getTiles() { return this.tiles; }
 
@@ -66,7 +83,7 @@ public class Team {
         team.setAllowFriendlyFire(false);
         team.setOption(org.bukkit.scoreboard.Team.Option.COLLISION_RULE, org.bukkit.scoreboard.Team.OptionStatus.NEVER);
         team.setCanSeeFriendlyInvisibles(true);
-        team.setColor(tc.getColor());
+        team.setColor(tc.getChatColor());
     }
 
     public void unregister(){
@@ -97,27 +114,37 @@ public class Team {
         tiles.remove(tile);
     }
 
-
+    private ItemStack color(Material mat){
+        ItemStack is = new ItemStack(mat);
+        LeatherArmorMeta lam = (LeatherArmorMeta) is.getItemMeta();
+        lam.setColor(tc.getColor());
+        lam.setUnbreakable(true);
+        is.setItemMeta(lam);
+        return is;
+    }
 
     public enum TeamColor {
 
-        BLUE(ChatColor.AQUA, 11, "블루"),
-        RED(ChatColor.RED, 14, "레드"),
-        GREEN(ChatColor.GREEN, 5, "그린"),
-        YELLOW(ChatColor.YELLOW, 4, "옐로우"),
-        ORANGE(ChatColor.GOLD, 1, "오렌지"),
-        PINK(ChatColor.LIGHT_PURPLE, 6, "핑크");
+        BLUE(ChatColor.AQUA, Color.BLUE ,11, "블루"),
+        RED(ChatColor.RED, Color.RED, 14, "레드"),
+        GREEN(ChatColor.GREEN, Color.GREEN, 5, "그린"),
+        YELLOW(ChatColor.YELLOW, Color.YELLOW, 4, "옐로우"),
+        ORANGE(ChatColor.GOLD, Color.ORANGE, 1, "오렌지"),
+        PINK(ChatColor.LIGHT_PURPLE, Color.PURPLE, 6, "핑크");
 
         private final ChatColor cc;
+        private final Color color;
         private final int data;
         private final String korean;
-        TeamColor(ChatColor cc, int data, String korean){
+        TeamColor(ChatColor cc, Color color, int data, String korean){
             this.cc = cc;
+            this.color = color;
             this.data = data;
             this.korean = korean;
         }
 
-        public ChatColor getColor() { return this.cc; }
+        public Color getColor() { return this.color; }
+        public ChatColor getChatColor() { return this.cc; }
         public short getData() { return (short) this.data; }
 
         public String getKoreanName() {
