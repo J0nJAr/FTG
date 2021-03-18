@@ -11,13 +11,14 @@ public class LocationUtil {
         Entity closestEntity = null;
         double closestDistance = 0.0;
 
-        for(Entity entity : center.getWorld().getEntities()){
+        for(Entity entity : center.getWorld().getNearbyEntities(center, radius, radius, radius)){
             double distance = entity.getLocation().distanceSquared(center);
-            if(closestEntity == null || (distance < closestDistance && entity.getType().equals(entityType))){
+            if(closestEntity == null || (entity.getType().equals(entityType) && distance < closestDistance)){
                 closestDistance = distance;
                 closestEntity = entity;
             }
         }
+
         return closestEntity;
     }
 

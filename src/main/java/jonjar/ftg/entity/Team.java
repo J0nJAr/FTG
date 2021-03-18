@@ -125,30 +125,41 @@ public class Team {
 
     public enum TeamColor {
 
-        BLUE(ChatColor.AQUA, Color.BLUE ,11, "블루"),
-        RED(ChatColor.RED, Color.RED, 14, "레드"),
-        GREEN(ChatColor.GREEN, Color.GREEN, 5, "그린"),
-        YELLOW(ChatColor.YELLOW, Color.YELLOW, 4, "옐로우"),
-        ORANGE(ChatColor.GOLD, Color.ORANGE, 1, "오렌지"),
-        PINK(ChatColor.LIGHT_PURPLE, Color.PURPLE, 6, "핑크");
+        BLUE(ChatColor.AQUA, Color.BLUE ,11, "블루", 0, 12),
+        RED(ChatColor.RED, Color.RED, 14, "레드", 0, 0),
+        GREEN(ChatColor.GREEN, Color.GREEN, 5, "그린", -6, 6),
+        YELLOW(ChatColor.YELLOW, Color.YELLOW, 4, "옐로우",-6, 0),
+        ORANGE(ChatColor.GOLD, Color.ORANGE, 1, "오렌지", 6, 6),
+        PINK(ChatColor.LIGHT_PURPLE, Color.PURPLE, 6, "핑크", 6, 0);
 
         private final ChatColor cc;
         private final Color color;
         private final int data;
         private final String korean;
-        TeamColor(ChatColor cc, Color color, int data, String korean){
+
+        private final int baseX;
+        private final int baseZ;
+        TeamColor(ChatColor cc, Color color, int data, String korean, int x, int z){
             this.cc = cc;
             this.color = color;
             this.data = data;
             this.korean = korean;
+            this.baseX = x;
+            this.baseZ = z;
         }
 
+        public int getBaseX() { return this.baseX; }
+        public int getBaseZ() { return this.baseZ; }
         public Color getColor() { return this.color; }
         public ChatColor getChatColor() { return this.cc; }
         public short getData() { return (short) this.data; }
 
         public String getKoreanName() {
             return cc + korean;
+        }
+
+        public Tile getBaseTile(){
+            return Tile.TILE_MAP.getTile(baseX, baseZ);
         }
     }
 

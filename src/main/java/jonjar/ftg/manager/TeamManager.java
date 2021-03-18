@@ -62,12 +62,16 @@ public class TeamManager extends MsgSender{
                         teams.add(Team.TeamColor.BLUE);
                         teams.add(Team.TeamColor.RED);
                     case 3:
-                        teams.add(Team.TeamColor.GREEN);
-                    case 4:
+                        teams.remove(Team.TeamColor.RED);
                         teams.add(Team.TeamColor.YELLOW);
+                        teams.add(Team.TeamColor.PINK);
+                    case 4:
+                        teams.remove(Team.TeamColor.YELLOW);
+                        teams.add(Team.TeamColor.GREEN);
+                        teams.add(Team.TeamColor.RED);
                     case 6:
                         teams.add(Team.TeamColor.ORANGE);
-                        teams.add(Team.TeamColor.PINK);
+                        teams.add(Team.TeamColor.YELLOW);
                 }
 
                 for(Team.TeamColor tc : teams){

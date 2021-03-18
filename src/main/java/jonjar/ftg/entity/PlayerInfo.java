@@ -2,6 +2,7 @@ package jonjar.ftg.entity;
 
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
@@ -29,6 +30,12 @@ public class PlayerInfo {
 
     private boolean observe = false;
     private Team team;
+
+
+    // Player Stats
+    private int kill = 0; // 킬
+    private int death = 0; // 데스
+    private int tile_assist = 0; // 타일 점령 도움
 
 
     public PlayerInfo(String name, UUID uuid){
@@ -62,6 +69,19 @@ public class PlayerInfo {
         this.team = team;
     }
 
+    public void kill(Player target){
+        kill++;
+
+        PlayerInfo pi = PlayerInfo.getPlayerInfo(target);
+        pi.death();
+    }
+
+    public void death(){
+        death++;
+    }
+
+    public void capture
+
     public void equipKits(boolean reset){
         if(this.team == null || Bukkit.getPlayer(uuid) == null) return;
 
@@ -79,6 +99,8 @@ public class PlayerInfo {
 
     public void teleportBase(){
         if(this.team == null || Bukkit.getPlayer(uuid) == null) return;
+        Location loc = team.getColor().getBaseTile().getCenter().clone();
+        Bukkit.getPlayer(uuid).teleport(loc.clone().add(0, 1, 0));
     }
 
     private final static ItemStack KIT_SWORD;

@@ -13,6 +13,9 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.block.BlockPlaceEvent;
+import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerLoginEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
@@ -23,6 +26,28 @@ public class EventManager implements Listener {
 
     public EventManager(FTG plugin){
         main = plugin;
+    }
+
+    @EventHandler
+    public void onBreak(BlockBreakEvent event){
+        Player p = event.getPlayer();
+        if(!p.isOp())
+            event.setCancelled(true);
+    }
+
+    @EventHandler
+    public void onPlace(BlockPlaceEvent event){
+        Player p = event.getPlayer();
+        if(!p.isOp())
+            event.setCancelled(true);
+    }
+
+    @EventHandler
+    public void onHit(EntityDamageEvent event){
+        if(event.getEntity() instanceof Player){
+            if(GameManager.STATE != GameManager.GameState.START)
+                event.setCancelled(true);
+        }
     }
 
     @EventHandler
@@ -43,7 +68,7 @@ public class EventManager implements Listener {
 
             Material mat = to.getWorld().getBlockAt(to.getBlockX(), 5, to.getBlockZ()).getType();
             if(mat == Material.CONCRETE){
-                Entity near = LocationUtil.getClosestEntityType(to, 6.0D, EntityType.ARMOR_STAND);
+                Entity near = LocationUtil.getClosestEntityType(to, 10.0D, EntityType.ARMOR_STAND);
                 String name = near.getCustomName();
 
                 String[] split = name.split(",");
