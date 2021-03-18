@@ -111,7 +111,7 @@ public class CommandManager extends MsgSender implements CommandExecutor {
         if(args.length>0){
             switch (args[1]){
                 case "setTile":
-                    for (Tile tile: Tile.TileSet) {
+                    for (Tile tile: Tile.TILE_SET) {
                         for(Block bl:tile.getBlocks()){
                             bl.setType(Material.CONCRETE);
                         }
