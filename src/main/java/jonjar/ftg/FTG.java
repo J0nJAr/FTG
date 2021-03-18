@@ -1,6 +1,8 @@
 package jonjar.ftg;
 
+import jonjar.ftg.entity.Team;
 import jonjar.ftg.manager.CommandManager;
+import jonjar.ftg.manager.EventManager;
 import jonjar.ftg.manager.GameManager;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
@@ -9,6 +11,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 public final class FTG extends JavaPlugin {
 
     private GameManager gm;
+    private EventManager em;
 
     public static World world;
 
@@ -28,9 +31,12 @@ public final class FTG extends JavaPlugin {
         */
 
         world = Bukkit.getWorlds().get(0);
+        Team.initScoreboardManager(Bukkit.getScoreboardManager().getMainScoreboard());
         cm = new CommandManager(this);
         gm = new GameManager(this);
+        em = new EventManager(this);
 
+        Bukkit.getPluginManager().registerEvents(em, this);
         getCommand("ftg").setExecutor(cm);
         //getCommand("ftg").tabComplete(new TabCompleteManager());
     }
@@ -43,4 +49,5 @@ public final class FTG extends JavaPlugin {
     public GameManager getGameManager(){
         return this.gm;
     }
+    public EventManager getEventManager() { return this.em; }
 }

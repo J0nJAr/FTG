@@ -73,7 +73,7 @@ public class CommandManager extends MsgSender implements CommandExecutor {
 
     private void team(Player p, String[] args) {
 
-        if(args.length == 0)
+        if(args.length == 1)
             tm.help(p);
         else if(args[1].equalsIgnoreCase("random"))
             tm.random(p, args);
@@ -116,7 +116,9 @@ public class CommandManager extends MsgSender implements CommandExecutor {
                             bl.setType(Material.CONCRETE);
                         }
                     }
+                    break;
                 case "register":
+
                     Tile.registerTiles();
                     msg(p, "등록함");
             }

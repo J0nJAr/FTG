@@ -6,6 +6,8 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
+import org.bukkit.entity.ArmorStand;
+import org.bukkit.entity.EntityType;
 import org.bukkit.material.Rails;
 
 import java.util.*;
@@ -19,14 +21,19 @@ public class Tile {
 
 
     public static TileMapC TILE_MAP= new TileMapC();
-    public static Set<Tile> TILE_SET = new HashSet<Tile>();
+    public static Set<Tile> TILE_SET = new HashSet<>();
 
 
 
-    private Location center = null;
+    private final Location center;
+    private final String name;
+    private ArmorStand centerDummy;
 
-    Tile(Location center){
+    Tile(Location center, String name){
         this.center = center;
+        this.name = name;
+
+
         this.registerLocations();
     }
 
@@ -34,6 +41,21 @@ public class Tile {
     Set<Block> result = new HashSet<Block>();
         this.getLocations().forEach(l -> result.add(l.getBlock()));
         return result;
+    }
+
+    public void spawnDummy(){
+        ArmorStand as = (ArmorStand) center.getWorld().spawnEntity(center.clone().add(0, -2, 0), EntityType.ARMOR_STAND);
+        as.setGravity(false);
+        as.setInvulnerable(true);
+        as.setVisible(false);
+        as.setCustomName(name);
+        as.setCustomNameVisible(false);
+        centerDummy = as;
+    }
+
+    public void killDummy(){
+        centerDummy.remove();
+        centerDummy = null;
     }
 
     public void registerLocations(){
@@ -64,13 +86,30 @@ public class Tile {
         return center;
     }
 
+    public ArmorStand getDummy(){
+        return this.centerDummy;
+    }
+
+    public static void unregisterDummy(){
+        for(Tile tile : TILE_SET){
+            if(tile.getDummy() != null)
+                tile.killDummy();
+        }
+    }
+
+    public static void registerDummy(){
+        for(Tile tile : TILE_SET){
+            if(tile.getDummy() != null)
+                tile.spawnDummy();
+        }
+    }
 
     public static void registerTiles(){
         final int distance = RADIUS*2-1;
         int amount = RADIUS*2+1;
 
        //final Location CENTER =
-       Location upperF = new Location(FTG.world,153D,5D,-52D);
+       Location upperF = new Location(FTG.world,153.5D,5D,-51.5D);
        Location lowerF = upperF.clone();
 
        TILE_MAP.addTiles(0,amount,upperF);
@@ -86,7 +125,7 @@ public class Tile {
        }
     }
 
-    private static class TileMapC{
+    public static class TileMapC {
         private HashMap<Integer,ArrayList<Tile>> map;
 
         TileMapC(){
@@ -98,11 +137,12 @@ public class Tile {
                 map.put(x_index,new ArrayList<Tile>());
             }
             map.get(x_index).add(tile);
+            tile.spawnDummy();
             TILE_SET.add(tile);
         }
         public void addTiles(int x_index,int amount,Location first){
             for (int i=0;i<amount;i++){
-                addTile(x_index,new Tile(first.clone().add(0,0,i*(RADIUS*2+2))));
+                addTile(x_index,new Tile(first.clone().add(0,0,i*(RADIUS*2+2)), x_index + "," + i));
             }
         }
 
