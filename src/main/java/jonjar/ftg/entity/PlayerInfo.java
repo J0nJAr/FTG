@@ -13,8 +13,9 @@ public class PlayerInfo {
     private static HashMap<String, PlayerInfo> PlayerInfoList = new HashMap<>();
 
     public static PlayerInfo getPlayerInfo(Player p){
-        return PlayerInfoList.get(p.getName());
+        return PlayerInfoList.get(p.getName().toLowerCase());
     }
+    public static PlayerInfo getPlayerInfo(String name) { return PlayerInfoList.get(name.toLowerCase()); }
 
 
     private final String name;
@@ -27,6 +28,7 @@ public class PlayerInfo {
     public PlayerInfo(String name, UUID uuid){
         this.name = name;
         this.uuid = uuid;
+        PlayerInfoList.put(name.toLowerCase(), this);
     }
 
     public String getName() { return this.name; }
@@ -36,6 +38,8 @@ public class PlayerInfo {
 
     public void setObserve(boolean observe){
         this.observe = observe;
+        if(observe)
+            leaveTeam();
     }
 
     public void leaveTeam(){
@@ -46,7 +50,7 @@ public class PlayerInfo {
     }
 
     public void joinTeam(Team team){
-        if(team != null)
+        if(this.team != null)
             leaveTeam();
         team.addPlayer(uuid);
         this.team = team;

@@ -8,7 +8,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 
 public class GameManager extends MsgSender {
-    
+
     private final FTG plugin;
     public GameManager(FTG main){
         this.plugin = main;
@@ -28,18 +28,26 @@ public class GameManager extends MsgSender {
         if(runnable != null && !runnable.isCancelled()){
             error(p, "이미 게임이 시작되어있습니다.");
         } else {
-            reset();
-            runnable = new GameManagerTask();
-            runnable.runTaskTimer(plugin, 0L, 20L);
-            broadcast("§f§l" + p.getName() + "님께서 게임을 시작하셨습니다!");
+
+            if(checkTeam()){
+                runnable = new GameManagerTask();
+                runnable.runTaskTimer(plugin, 0L, 20L);
+                broadcast("§f§l" + p.getName() + "님께서 게임을 시작하셨습니다!");
+            } else {
+                error(p, "§c팀 배분을 받지 못한 플레이어가 있습니다.");
+            }
+
         }
     }
 
     public void stop(Player p){
-        if(runnable != null && runnable.isCancelled()){
+        if(runnable == null || runnable.isCancelled()){
             error(p, "게임이 종료되어있습니다.");
         } else {
-
+            runnable.cancel();
+            runnable = null;
+            reset();
+            broadcast("§c§l" + p.getName() + "님께서 게임을 강제 종료하셨습니다.");
         }
     }
     
@@ -67,6 +75,14 @@ public class GameManager extends MsgSender {
 
     private void reset(){
         this.elapsed_sec = 0;
+
+        /*
+        TODO :
+        1. 플레이어 모두 티피올
+        2. 플레이어 아이템 초기화
+        3. 팀 초기화
+        4. 점수 등 DB 초기화
+         */
     }
 
 
@@ -79,7 +95,7 @@ public class GameManager extends MsgSender {
             
             switch(elapsed_sec){
                 case 1:
-
+                    
                     break;
             }
         }

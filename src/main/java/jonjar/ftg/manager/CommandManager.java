@@ -1,6 +1,7 @@
 package jonjar.ftg.manager;
 
 import jonjar.ftg.FTG;
+import jonjar.ftg.entity.PlayerInfo;
 import jonjar.ftg.entity.Tile;
 import jonjar.ftg.util.MsgSender;
 import org.bukkit.Location;
@@ -11,7 +12,15 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-public class CommandManger extends MsgSender implements CommandExecutor {
+public class CommandManager extends MsgSender implements CommandExecutor {
+
+    private final TeamManager tm;
+    private final FTG main;
+
+    public CommandManager(FTG plugin){
+        tm = new TeamManager();
+        main = plugin;
+    }
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
@@ -39,9 +48,9 @@ public class CommandManger extends MsgSender implements CommandExecutor {
         else if(args[0].equalsIgnoreCase("pause"))
             pause(p);
         else if(args[0].equalsIgnoreCase("team"))
-            team(p);
+            team(p, args);
         else if(args[0].equalsIgnoreCase("observer"))
-            observer(p);
+            observer(p, args);
         else if(args[0].equalsIgnoreCase("debug"))
             debug(p,args);
         else
@@ -51,18 +60,50 @@ public class CommandManger extends MsgSender implements CommandExecutor {
     }
     
     private void start(Player p){
-        
+        main.getGameManager().start(p);
     }
+
     private void stop(Player p) {
+        main.getGameManager().stop(p);
     }
 
     private void pause(Player p) {
+        main.getGameManager().pause(p);
     }
 
-    private void team(Player p) {
+    private void team(Player p, String[] args) {
+
+        if(args.length == 0)
+            tm.help(p);
+        else if(args[1].equalsIgnoreCase("random"))
+            tm.random(p, args);
+        else if(args[1].equalsIgnoreCase("setting"))
+            tm.setting(p, args);
+        else if(args[1].equalsIgnoreCase("join"))
+            tm.join(p, args);
+        else if(args[1].equalsIgnoreCase("list"))
+            tm.list(p);
+        else if(args[1].equalsIgnoreCase("leave"))
+            tm.leave(p, args);
+        else if(args[1].equalsIgnoreCase("reset"))
+            tm.reset(p);
+        else
+            tm.help(p);
+
     }
 
-    private void observer(Player p) {
+    private void observer(Player p, String[] args) {
+        if(args.length == 1)
+            error(p, "올바른 명령어 : /ftg observer [PLAYER]");
+        else {
+            PlayerInfo pi = PlayerInfo.getPlayerInfo(args[1]);
+            if(pi == null){
+                error(p, args[1] + " 은(는) 없는 플레이어입니다.");
+            } else {
+                pi.setObserve(!pi.isObserver());
+                msg(p, args[1] + " 님을 " + (pi.isObserver() ? "관전자" : "게임 참가자") + "로 설정했습니다.");
+            }
+        }
     }
 
     private void debug(Player p, String[] args) {
@@ -72,7 +113,7 @@ public class CommandManger extends MsgSender implements CommandExecutor {
                 case "setTile":
                     for (Tile tile: Tile.TileSet) {
                         for(Block bl:tile.getBlocks()){
-                            bl.setType(Material.WHITE_CONCRETE);
+                            bl.setType(Material.CONCRETE);
                         }
                     }
                 case "register":
@@ -90,7 +131,7 @@ public class CommandManger extends MsgSender implements CommandExecutor {
         msg(p, "§a/ftg stop §f게임을 종료합니다.");
         msg(p, "§a/ftg pause §f게임을 일시 정지합니다.");
         msg(p, "§a/ftg team §f팀 관련 명령어를 확인합니다.");
-        msg(p, "§a/ftg observer §f관전자 관련 명령어를 확인합니다.");
+        msg(p, "§a/ftg observer [PLAYER] §f해당 플레이어의 관전자 여부를 설정합니다.");
     }
 
     

@@ -1,29 +1,22 @@
 package jonjar.ftg;
 
-import jonjar.ftg.entity.Tile;
-import jonjar.ftg.manager.CommandManger;
-import jonjar.ftg.manager.TabCompleteManager;
+import jonjar.ftg.manager.CommandManager;
+import jonjar.ftg.manager.GameManager;
 import org.bukkit.Bukkit;
-import org.bukkit.Material;
 import org.bukkit.World;
-import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
-
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Properties;
 
 public final class FTG extends JavaPlugin {
 
+    private GameManager gm;
+
     public static World world;
 
-    Properties properties = new Properties();
-    CommandManger cm;
+    CommandManager cm;
     @Override
     public void onEnable() {
+
+        /*
         String worldName = null;
         try {
             properties.load(new FileInputStream("server.properties"));
@@ -32,11 +25,11 @@ public final class FTG extends JavaPlugin {
             e.printStackTrace();
         }
         if (worldName==null) worldName = "world";
+        */
 
-        cm = new CommandManger();
-        world = Bukkit.getWorld(worldName);
-
-
+        world = Bukkit.getWorlds().get(0);
+        cm = new CommandManager(this);
+        gm = new GameManager(this);
 
         getCommand("ftg").setExecutor(cm);
         //getCommand("ftg").tabComplete(new TabCompleteManager());
@@ -45,5 +38,9 @@ public final class FTG extends JavaPlugin {
     @Override
     public void onDisable() {
         // Plugin shutdown logic
+    }
+
+    public GameManager getGameManager(){
+        return this.gm;
     }
 }

@@ -23,7 +23,11 @@ repositories {
 }
 
 dependencies {
-    compileOnly 'org.spigotmc:spigot-api:1.16.5-R0.1-SNAPSHOT'
+    compileOnly 'org.spigotmc:spigot-api:1.12.2-R0.1-SNAPSHOT'
+}
+
+jar {
+    destinationDir(new File('D:/버킷/1122 플긴테스트/plugins'))
 }
 
 processResources {
