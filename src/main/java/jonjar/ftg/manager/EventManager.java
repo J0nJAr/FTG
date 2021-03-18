@@ -75,6 +75,8 @@ public class EventManager implements Listener {
                 int x = Integer.parseInt(split[0]);
                 int z = Integer.parseInt(split[1]);
 
+               // p.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText(t.toString()));
+
                 p.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText("§e" + x + " / " + z));
             } else {
                 p.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText("§cNONE"));

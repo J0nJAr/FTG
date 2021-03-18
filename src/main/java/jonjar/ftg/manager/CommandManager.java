@@ -118,12 +118,18 @@ public class CommandManager extends MsgSender implements CommandExecutor {
                     }
                     break;
                 case "register":
-
                     Tile.registerTiles();
                     msg(p, "타일 등록함");
-
                     Tile.registerAllNearTileList();
                     msg(p, "거리 등록함");
+                    break;
+                case "testDistance":
+                    Tile.TILE_MAP.getTile(0,11).registerNearTileList();
+
+                    for(int i = 0; i<8;i++){
+                        msg(p, "=============="+i+"============");
+                        Tile.TILE_MAP.getTile(0,11).getNearTileList().get(i).forEach(s ->msg(p,s.toString()));
+                    }
                     break;
             }
         }

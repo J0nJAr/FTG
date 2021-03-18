@@ -1,14 +1,10 @@
 package jonjar.ftg.entity;
 
-import javafx.util.Pair;
 import jonjar.ftg.FTG;
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
-import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.EntityType;
-import org.bukkit.material.Rails;
 
 import java.util.*;
 
@@ -19,6 +15,10 @@ public class Tile {
 
     private Set<Location> locationSet;
     private Set<Block> blockSet;
+
+
+    public static final Location LOCATION_0 =  new Location(FTG.world,153D,5D,-52D);
+
     private ArrayList<Set<Tile>> nearTileList;
 
     public static TileMapC TILE_MAP= new TileMapC();
@@ -88,11 +88,16 @@ public class Tile {
         }
     }
 
-    public boolean isAdjacent(int x_index,int z_index){
-
+    public static boolean isValid(int x_index,int z_index){
         if(z_index<0) return false;
         if(Math.abs(x_index)>RADIUS) return false;
         if((RADIUS*2-Math.abs(x_index))<z_index) return false;
+
+        return true;
+    }
+    public boolean isAdjacent(int x_index,int z_index){
+
+        if(isValid(x_index,z_index)) return false;
 
         if(Math.abs(z_index-this.z_index)<=1 && Math.abs(x_index-this.x_index)<=1){
             return true;
@@ -105,29 +110,62 @@ public class Tile {
         for(Tile tile:TILE_SET) tile.registerNearTileList();
     }
 
-    public void registerNearTileList() {
-        int[] _z = {0,1};
-        int[] _x = {-1,0,1};
-        int distance = 0;
+    static boolean[][] visited;
 
+    public void registerNearTileList() { //BFS
+
+
+        visited = new boolean[RADIUS*2+1][RADIUS*2+1];
+        for(int i=0;i<RADIUS*2+1;i++) for(int j=0;j<RADIUS*2+1;j++){
+            visited[i][j]=false;
+        }
+
+        int distance = 0;
+        nearTileList.add(new HashSet<Tile>());
+        nearTileList.get(distance).add(this);//자기 자신 추가
+        visited[6+this.x_index][this.z_index] = true;
         Queue<Tile> q = new LinkedList<>();
         q.add(this);
 
         while (!q.isEmpty()){
             distance++;
-            Tile tile = q.poll();
 
-            for(int x : _x) for(int z : _z){
-                if(isAdjacent(x,z)){
-                    if(nearTileList.get(distance)==null) nearTileList.add(new HashSet<Tile>());
-                    nearTileList.get(distance).add(TILE_MAP.getTile(x,z));
-                    Bukkit.broadcastMessage("거리 : "+distance+"타일1 "+this.toString()+"타일2 "+tile.toString());
-                    q.add(tile);
-                }
+           // Bukkit.broadcastMessage("==========깊이 :"+distance+"============");
+            int size = q.size();
+            for(int i=0;i<size;i++) {
+                int[] _x = { 1, 1, 0, 0,-1,-1};
+                int[] _z = {-1, 0,-1, 1, 0, 1};//상부
+                int[] __z = {0, 1,-1, 1, -1, 0};//하부
+               // Bukkit.broadcastMessage("---:"+i+"---");
+                Tile tile = q.poll();
+                for (int j=0;j<6;j++) {
+                        int z;
+                        int x;
+                        x = tile.x_index + _x[j];
+                        if(x>0) z = tile.z_index + _z[j];
+                        else z = tile.z_index + __z[j];
+                    //    Bukkit.broadcastMessage("x, z"+x+","+z);
+
+                        if (isValid(x,z)&&!visited[6 + x][z]) {
+                            visited[6 + x][z] = true;
+
+                            if (!(nearTileList.size() < distance)) {
+                                nearTileList.add(new HashSet<>());
+                            }
+                            Tile theTile = TILE_MAP.getTile(x,z);
+
+                            nearTileList.get(distance).add(theTile);
+
+                           // Bukkit.broadcastMessage("거리 : " + distance + "[타일a " + this.toString() + "타일b " + theTile.toString() + "]");
+                            q.add(theTile);
+                        }
+                    }
             }
         }
     }
-
+    public ArrayList<Set<Tile>> getNearTileList() {
+        return nearTileList;
+    }
 
     public Set<Location> getLocations(){
         return this.locationSet;
@@ -160,7 +198,7 @@ public class Tile {
         int amount = RADIUS*2+1;
 
        //final Location CENTER =
-       Location upperF = new Location(FTG.world,153D,5D,-52D);
+       Location upperF = LOCATION_0;
        Location lowerF = upperF.clone();
 
        TILE_MAP.addTiles(0,amount,upperF);
@@ -201,7 +239,8 @@ public class Tile {
         }
 
         public Tile getTile(int x_index,int z_index){
-            return map.get(x_index).get(z_index);
+            if(isValid(x_index,z_index)) return map.get(x_index).get(z_index);
+            else return map.get(0).get(0);
         }
     }
 }
