@@ -80,7 +80,7 @@ public class PlayerInfo {
         death++;
     }
 
-    public void capture
+    //public void capture
 
     public void equipKits(boolean reset){
         if(this.team == null || Bukkit.getPlayer(uuid) == null) return;

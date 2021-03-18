@@ -159,7 +159,7 @@ public class Team {
         }
 
         public Tile getBaseTile(){
-            return Tile.TILE_MAP.getTile(baseX, baseZ);
+            return Tile.TILE_MAP.getTile(baseX,baseZ);
         }
     }
 

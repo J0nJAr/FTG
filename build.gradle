@@ -27,7 +27,7 @@ dependencies {
 }
 
 jar {
-    destinationDir(new File('D:/버킷/1122 플긴테스트/plugins'))
+    destinationDir(new File('build/libs'))
 }
 
 processResources {

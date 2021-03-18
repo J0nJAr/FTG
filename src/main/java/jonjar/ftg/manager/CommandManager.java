@@ -120,7 +120,11 @@ public class CommandManager extends MsgSender implements CommandExecutor {
                 case "register":
 
                     Tile.registerTiles();
-                    msg(p, "등록함");
+                    msg(p, "타일 등록함");
+
+                    Tile.registerAllNearTileList();
+                    msg(p, "거리 등록함");
+                    break;
             }
         }
     }
