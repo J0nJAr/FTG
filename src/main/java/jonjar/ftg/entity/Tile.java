@@ -1,5 +1,6 @@
 package jonjar.ftg.entity;
 
+import com.google.common.collect.Multimap;
 import jonjar.ftg.FTG;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
@@ -19,7 +20,8 @@ public class Tile {
 
     public static final Location LOCATION_0 =  new Location(FTG.world,153D,5D,-52D);
 
-    private ArrayList<Set<Tile>> nearTileList;
+    private ArrayList<Set<Tile>> nearTileList; //거리별 타일
+    private HashMap<Tile,Integer> tileDistanceList;//타일별 거리
 
     public static TileMapC TILE_MAP= new TileMapC();
     public static Set<Tile> TILE_SET = new HashSet<>();
@@ -162,7 +164,16 @@ public class Tile {
                     }
             }
         }
+
     }
+    public void registerDistanceTileList(){
+        int i = 0;
+        for(Set<Tile> tile : this.getNearTileList()){
+            for(Tile t : tile) tileDistanceList.put(t, i);
+            i++;
+        }
+    }
+
     public ArrayList<Set<Tile>> getNearTileList() {
         return nearTileList;
     }
