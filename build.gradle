@@ -26,8 +26,13 @@ dependencies {
     compileOnly 'org.spigotmc:spigot-api:1.12.2-R0.1-SNAPSHOT'
 }
 
+task printDir {
+    println(System.getenv("PLUGIN_DIR"))
+    println(System.getenv("PATH"))
+}
+
 jar {
-    destinationDir(new File('build/libs'))
+    destinationDir(new File(System.getenv("PLUGIN_DIR")))
 }
 
 processResources {
