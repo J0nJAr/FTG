@@ -26,10 +26,11 @@ public class GameManager extends MsgSender {
 
     public static GameState STATE = GameState.WAIT;
 
-    private int elapsed_sec;
+    private int elapsed_tick;
     public static boolean PAUSE = false;
 
     private GameManagerTask runnable;
+    private MainGameTask main_task;
 
 
     /*
@@ -88,7 +89,7 @@ public class GameManager extends MsgSender {
     
 
     private void reset(){
-        this.elapsed_sec = 0;
+        this.elapsed_tick = 0;
 
         for(Player ap : Bukkit.getOnlinePlayers()){
             ap.getInventory().clear();
@@ -109,6 +110,27 @@ public class GameManager extends MsgSender {
          */
     }
 
+    public class MainGameTask extends BukkitRunnable {
+        public void run(){
+
+            if(PAUSE)
+                return;
+
+            if(STATE == GameState.END){
+                this.cancel();
+                return;
+            }
+
+            updatePlayers();
+        }
+
+        private void updatePlayers(){
+            // 액션바
+            for(Player ap : Bukkit.getOnlinePlayers()){
+
+            }
+        }
+    }
 
     public class GameManagerTask extends BukkitRunnable {
 
@@ -117,35 +139,44 @@ public class GameManager extends MsgSender {
             if(PAUSE)
                 return;
             
-            switch(elapsed_sec++){
-                case 1:
+            switch(elapsed_tick++){
+                case 20:
                     broadcast("§f==================");
                     broadcast("§b땅따먹기 미니게임");
                     broadcast("§7제작 : KimBepo, macham");
                     broadcast("§f==================");
                     break;
-                case 2:
+                case 40:
                     broadcast("§7게임 설정 초기화 중...");
                     Tile.registerTiles();
 
                     break;
-                case 5:
+                case 100:
                     broadcast("§f초기화 완료. 3초 뒤 게임을 시작합니다.");
                     break;
-                case 6:
-                case 7:
-                case 8:
-                    broadcast("§c§l" + (9-elapsed_sec) + "초 전...");
+                case 120:
+                case 140:
+                case 160:
+                    broadcast("§c§l" + (9-elapsed_tick/20) + "초 전...");
                     break;
-                case 9:
+                case 180:
                     for(Player ap : Bukkit.getOnlinePlayers()) {
                         PlayerInfo pi = PlayerInfo.getPlayerInfo(ap);
                         pi.teleportBase();
                         pi.equipKits(true);
                     }
                     broadcast("§b§l게임 시작! 최대한 많은 땅을 점령하세요!");
+                    main_task = new MainGameTask();
+                    main_task.runTaskTimer(plugin, 5L, 5L);
                     break;
             }
+        }
+
+        public void cancel(){
+            super.cancel();
+            if(main_task != null && !main_task.isCancelled())
+                main_task.cancel();
+            main_task = null;
         }
 
     }

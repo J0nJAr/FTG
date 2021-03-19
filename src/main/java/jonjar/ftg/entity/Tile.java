@@ -38,7 +38,6 @@ public class Tile {
 
     private Team.TeamColor own;
     private int state_tick = 0;
-    private HashMap<Team.TeamColor, Set<Location>> need_occupied_block;
 
     Tile(Location center, int x_index, int y_index){
         this.center = center;
@@ -47,7 +46,6 @@ public class Tile {
 
         this.registerLocations();
         nearTileList = new ArrayList<>();
-        need_occupied_block = new HashSet<>(locationSet);
     }
 
     @Override
