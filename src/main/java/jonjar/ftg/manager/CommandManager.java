@@ -5,6 +5,9 @@ import jonjar.ftg.entity.PlayerInfo;
 import jonjar.ftg.entity.Tile;
 import jonjar.ftg.util.MsgSender;
 
+import net.md_5.bungee.api.chat.ClickEvent;
+import net.md_5.bungee.api.chat.ComponentBuilder;
+import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -13,6 +16,8 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
+import java.util.Arrays;
+import java.util.List;
 
 
 public class CommandManager extends MsgSender implements CommandExecutor {
@@ -24,7 +29,7 @@ public class CommandManager extends MsgSender implements CommandExecutor {
         tm = new TeamManager();
         main = plugin;
     }
-
+    public static final List<String> CMD_MAIN = Arrays.asList("start","stop","pause","team","observer","debug");
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
 
@@ -74,6 +79,8 @@ public class CommandManager extends MsgSender implements CommandExecutor {
         main.getGameManager().pause(p);
     }
 
+    public final static List<String> CMD_TEAM = Arrays.asList("random", "setting", "join", "list", "leave", "reset");
+
     private void team(Player p, String[] args) {
 
         if(args.length == 1)
@@ -109,13 +116,17 @@ public class CommandManager extends MsgSender implements CommandExecutor {
         }
     }
 
+    public final static List<String> CMD_DEBUG = Arrays.asList("setTile","register","testDistance");
+
     private void debug(Player p, String[] args) {
         if(args.length==1){
-            msg_cmt(p, getCmt_Click(ChatColor.BLUE +"=======DEBUG=======", new String[]{"debug"}));
+            msg_cmt(p, new TextComponent(new ComponentBuilder("=======").
+                            append("Debug").event(new ClickEvent(ClickEvent.Action.RUN_COMMAND,"/FTG debug")).color(net.md_5.bungee.api.ChatColor.YELLOW).
+                            append("=======").color(net.md_5.bungee.api.ChatColor.WHITE).create()));
             msg_cmt(p, getCmt_Click(ChatColor.GRAY +"setTile", new String[]{"debug", "setTile"}));
             msg_cmt(p, getCmt_Click(ChatColor.GRAY +"register", new String[]{"debug", "register"}));
             msg_cmt(p, getCmt_Click(ChatColor.GRAY +"testDistance", new String[]{"debug", "testDistance"}));
-            msg_cmt(p, getCmt_Click("RELOAD", ChatColor.DARK_RED+""+ChatColor.BOLD+"RELOAD" ,new String[]{"confirm"}));
+            msg_cmt(p, getCmt_Click("RELOAD", ChatColor.DARK_RED+""+ChatColor.BOLD+"FORCE RELOAD" ,new String[]{"confirm"}));
         }
         else {
             switch (args[1]){

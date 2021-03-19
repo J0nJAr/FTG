@@ -4,6 +4,7 @@ import jonjar.ftg.entity.Team;
 import jonjar.ftg.manager.CommandManager;
 import jonjar.ftg.manager.EventManager;
 import jonjar.ftg.manager.GameManager;
+import jonjar.ftg.manager.TabCompleteManager;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -12,6 +13,7 @@ public final class FTG extends JavaPlugin {
 
     private GameManager gm;
     private EventManager em;
+    private TabCompleteManager tcm;
 
     public static World world;
 
@@ -35,9 +37,12 @@ public final class FTG extends JavaPlugin {
         cm = new CommandManager(this);
         gm = new GameManager(this);
         em = new EventManager(this);
+        tcm = new TabCompleteManager(this);
 
         Bukkit.getPluginManager().registerEvents(em, this);
+
         getCommand("ftg").setExecutor(cm);
+        getCommand("ftg").setTabCompleter(tcm);
         //getCommand("ftg").tabComplete(new TabCompleteManager());
     }
 

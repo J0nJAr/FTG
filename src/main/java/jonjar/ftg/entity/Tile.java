@@ -23,6 +23,8 @@ public class Tile {
     private ArrayList<Set<Tile>> nearTileList; //거리별 타일
     private HashMap<Tile,Integer> tileDistanceList;//타일별 거리
 
+
+
     public static TileMapC TILE_MAP= new TileMapC();
     public static Set<Tile> TILE_SET = new HashSet<>();
 
@@ -112,10 +114,12 @@ public class Tile {
         for(Tile tile:TILE_SET) tile.registerNearTileList();
     }
 
-    static boolean[][] visited;
+    public HashMap<Tile, Integer> getTileDistanceList() {
+        return tileDistanceList;
+    }
 
     public void registerNearTileList() { //BFS
-
+        boolean[][] visited;
 
         visited = new boolean[RADIUS*2+1][RADIUS*2+1];
         for(int i=0;i<RADIUS*2+1;i++) for(int j=0;j<RADIUS*2+1;j++){
