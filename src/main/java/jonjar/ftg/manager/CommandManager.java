@@ -111,9 +111,10 @@ public class CommandManager extends MsgSender implements CommandExecutor {
 
     private void debug(Player p, String[] args) {
         if(args.length==1){
-            msg_cmt(p, getCmt_Click("setTile", new String[]{"debug", "setTile"}));
-            msg_cmt(p, getCmt_Click("register", new String[]{"debug", "register"}));
-            msg_cmt(p, getCmt_Click("testDistance", new String[]{"debug", "testDistance"}));
+            msg_cmt(p, getCmt_Click(ChatColor.BLUE +"=======DEBUG=======", new String[]{"debug"}));
+            msg_cmt(p, getCmt_Click(ChatColor.GRAY +"setTile", new String[]{"debug", "setTile"}));
+            msg_cmt(p, getCmt_Click(ChatColor.GRAY +"register", new String[]{"debug", "register"}));
+            msg_cmt(p, getCmt_Click(ChatColor.GRAY +"testDistance", new String[]{"debug", "testDistance"}));
             msg_cmt(p, getCmt_Click("RELOAD", ChatColor.DARK_RED+""+ChatColor.BOLD+"RELOAD" ,new String[]{"confirm"}));
         }
         else {
