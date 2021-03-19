@@ -5,6 +5,9 @@ import jonjar.ftg.entity.PlayerInfo;
 import jonjar.ftg.entity.Tile;
 import jonjar.ftg.util.MsgSender;
 
+import net.md_5.bungee.api.chat.ClickEvent;
+import net.md_5.bungee.api.chat.ComponentBuilder;
+import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -111,7 +114,9 @@ public class CommandManager extends MsgSender implements CommandExecutor {
 
     private void debug(Player p, String[] args) {
         if(args.length==1){
-            msg_cmt(p, getCmt_Click(ChatColor.BLUE +"=======DEBUG=======", new String[]{"debug"}));
+            msg_cmt(p, new TextComponent(new ComponentBuilder("=======").
+                            append("Debug").event(new ClickEvent(ClickEvent.Action.RUN_COMMAND,"/FTG debug")).color(net.md_5.bungee.api.ChatColor.YELLOW).
+                            append("=======").color(net.md_5.bungee.api.ChatColor.WHITE).create()));
             msg_cmt(p, getCmt_Click(ChatColor.GRAY +"setTile", new String[]{"debug", "setTile"}));
             msg_cmt(p, getCmt_Click(ChatColor.GRAY +"register", new String[]{"debug", "register"}));
             msg_cmt(p, getCmt_Click(ChatColor.GRAY +"testDistance", new String[]{"debug", "testDistance"}));

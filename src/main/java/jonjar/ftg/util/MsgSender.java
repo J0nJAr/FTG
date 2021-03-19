@@ -1,7 +1,9 @@
 package jonjar.ftg.util;
 
 import jonjar.ftg.FTG;
+import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.ClickEvent;
+import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
@@ -15,8 +17,8 @@ public class MsgSender {
     public void msg(CommandSender sender, String msg){
         sender.sendMessage("§e[FTG] §f" + msg);
     }
-    public void msg_cmt(CommandSender sender, TextComponent textComponent){
-        sender.spigot().sendMessage(new TextComponent("§e[FTG] §f"), textComponent);
+    public void msg_cmt(CommandSender sender, BaseComponent Component){
+        sender.spigot().sendMessage(new TextComponent("§e[FTG] §f"), Component);
     }
 
     public void error(CommandSender sender, String msg){
@@ -38,7 +40,7 @@ public class MsgSender {
         ));
         return result;
     }
-    public TextComponent getCmt_Click(String text, String... args){
+    public TextComponent getCmt_Click(String text, String[] args){
         return getCmt_Click("FTG",text ,args);
     }
 
