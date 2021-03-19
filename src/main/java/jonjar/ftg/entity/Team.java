@@ -83,6 +83,7 @@ public class Team {
         team.setAllowFriendlyFire(false);
         team.setOption(org.bukkit.scoreboard.Team.Option.COLLISION_RULE, org.bukkit.scoreboard.Team.OptionStatus.NEVER);
         team.setCanSeeFriendlyInvisibles(true);
+        team.setPrefix(tc.getChatColor() + "");
         team.setColor(tc.getChatColor());
     }
 

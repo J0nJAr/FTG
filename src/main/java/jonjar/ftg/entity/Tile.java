@@ -3,9 +3,11 @@ package jonjar.ftg.entity;
 import com.google.common.collect.Multimap;
 import jonjar.ftg.FTG;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.EntityType;
+import org.bukkit.material.Colorable;
 
 import java.util.*;
 
@@ -34,6 +36,10 @@ public class Tile {
     public final int x_index, z_index;
     private ArmorStand centerDummy;
 
+    private Team.TeamColor own;
+    private int state_tick = 0;
+    private HashMap<Team.TeamColor, Set<Location>> need_occupied_block;
+
     Tile(Location center, int x_index, int y_index){
         this.center = center;
         this.x_index=x_index;
@@ -41,6 +47,7 @@ public class Tile {
 
         this.registerLocations();
         nearTileList = new ArrayList<>();
+        need_occupied_block = new HashSet<>(locationSet);
     }
 
     @Override
@@ -71,8 +78,46 @@ public class Tile {
         centerDummy = null;
     }
 
+    public void processOccupation(Team.TeamColor tc){
+        if(own != null && tc == own){
+            if(state_tick > -100)
+                state_tick--;
+        }
+
+        state_tick++;
+        if(state_tick == 100){
+            tc = own;
+            state_tick = -100;
+        }
+
+        /*
+        int size = need_occupied_block.size();
+        Random rn = new Random();
+
+        if(size == 0){
+            // 점령 끝
+            own =
+        }
+        int r = rn.nextInt(size);
+        */
+
+
+    }
+
+    public void colorAll(Team.TeamColor tc){
+        Material mat = Material.CONCRETE;
+        short dura = tc != null ? tc.getData() : 0;
+
+        for(Block b : getBlocks()){
+            b.setType(mat);
+            b.setData((byte) dura);
+        }
+
+        own = tc;
+    }
+
     public void registerLocations(){
-        locationSet = new HashSet<Location>();
+        locationSet = new HashSet<>();
 
         for (int z=0;z<=2*radius;z++) {
             locationSet.add(center.clone().add(0,0,z-radius));

@@ -67,20 +67,21 @@ public class EventManager implements Listener {
         if(from.getX() != to.getX() || from.getZ() != to.getZ()){
 
             Material mat = to.getWorld().getBlockAt(to.getBlockX(), 5, to.getBlockZ()).getType();
+            String text = "§cNONE";
             if(mat == Material.CONCRETE){
-                Entity near = LocationUtil.getClosestEntityType(to, 10.0D, EntityType.ARMOR_STAND);
-                String name = near.getCustomName();
+                try{
+                    Entity near = LocationUtil.getClosestEntityType(to, 10.0D, EntityType.ARMOR_STAND);
+                    String name = near.getCustomName();
 
-                String[] split = name.split(",");
-                int x = Integer.parseInt(split[0]);
-                int z = Integer.parseInt(split[1]);
+                    String[] split = name.split(",");
+                    int x = Integer.parseInt(split[0]);
+                    int z = Integer.parseInt(split[1]);
+                    text = "§e" + x + " / " + z;
+                } catch(Exception ignored){
 
-               // p.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText(t.toString()));
-
-                p.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText("§e" + x + " / " + z));
-            } else {
-                p.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText("§cNONE"));
+                }
             }
+            p.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText(text));
 
         }
     }

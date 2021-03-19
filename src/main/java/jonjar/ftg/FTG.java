@@ -1,12 +1,16 @@
 package jonjar.ftg;
 
+import jonjar.ftg.entity.PlayerInfo;
 import jonjar.ftg.entity.Team;
+import jonjar.ftg.entity.Tile;
 import jonjar.ftg.manager.CommandManager;
 import jonjar.ftg.manager.EventManager;
 import jonjar.ftg.manager.GameManager;
 import jonjar.ftg.manager.TabCompleteManager;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
+import org.bukkit.entity.ArmorStand;
+import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public final class FTG extends JavaPlugin {
@@ -39,16 +43,28 @@ public final class FTG extends JavaPlugin {
         em = new EventManager(this);
         tcm = new TabCompleteManager(this);
 
+        Tile.registerTiles();
+        Tile.registerAllNearTileList();
+        for(ArmorStand e : world.getEntitiesByClass(ArmorStand.class)){
+            if(e.getCustomName() != null)
+                e.remove();
+        }
+        Tile.registerDummy();
+
         Bukkit.getPluginManager().registerEvents(em, this);
 
         getCommand("ftg").setExecutor(cm);
+
+        for(Player ap : Bukkit.getOnlinePlayers()){
+            new PlayerInfo(ap.getName(), ap.getUniqueId());
+        }
         getCommand("ftg").setTabCompleter(tcm);
         //getCommand("ftg").tabComplete(new TabCompleteManager());
     }
 
     @Override
     public void onDisable() {
-        // Plugin shutdown logic
+        Tile.unregisterDummy();
     }
 
     public GameManager getGameManager(){

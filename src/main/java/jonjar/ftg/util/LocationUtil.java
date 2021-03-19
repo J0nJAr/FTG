@@ -27,7 +27,7 @@ public class LocationUtil {
 
         return closestEntity;
     }
-/*
+
     public static Tile getClosestTile(Location player){
         Location location = player.clone().subtract(Tile.LOCATION_0).add(7*10,0,+39);
         Location loc = player.clone();
@@ -47,5 +47,5 @@ public class LocationUtil {
         }
 
         return tile;
-    }*/
+    }
 }
