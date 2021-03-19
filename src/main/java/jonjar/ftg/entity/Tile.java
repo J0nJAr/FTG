@@ -1,13 +1,13 @@
 package jonjar.ftg.entity;
 
-import com.google.common.collect.Multimap;
+
 import jonjar.ftg.FTG;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.EntityType;
-import org.bukkit.material.Colorable;
+
 
 import java.util.*;
 
@@ -256,7 +256,7 @@ public class Tile {
         int amount = RADIUS*2+1;
 
        //final Location CENTER =
-       Location upperF = LOCATION_0;
+       Location upperF = LOCATION_0.clone();
        Location lowerF = upperF.clone();
 
        TILE_MAP.addTiles(0,amount,upperF);

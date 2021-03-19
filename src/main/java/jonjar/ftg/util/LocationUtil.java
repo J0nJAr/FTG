@@ -1,5 +1,6 @@
 package jonjar.ftg.util;
 
+
 import jonjar.ftg.entity.Tile;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -28,24 +29,39 @@ public class LocationUtil {
         return closestEntity;
     }
 
+    static final int CHECK_SIZE = 1;
     public static Tile getClosestTile(Location player){
-        Location location = player.clone().subtract(Tile.LOCATION_0).add(7*10,0,+39);
-        Location loc = player.clone();
-        loc.setY(5);
+        Location location = player.clone().subtract(Tile.LOCATION_0);
+        Location playerLoc = player.clone();
+        playerLoc.setY(5);
 
-        Tile tile = Tile.TILE_MAP.getTile((int)Math.round(location.getX()/(147/13)), (int)Math.round(location.getZ()/(183/13)));
+        int x = (int)Math.rint(location.getX()/12);
+        int z = (int)Math.rint((location.getZ()-Math.abs(x*7))/14);
 
-        Bukkit.broadcastMessage(""+location.getBlockX()+","+location.getBlockZ()+"  || "+Math.round(location.getX()/(147/13))+","+Math.round(location.getZ()/(183/13))+"\n"+loc.toString());
+        Tile tile = Tile.TILE_MAP.getTile(x, z);
+/*
+        Bukkit.broadcastMessage("========================================");
+        Bukkit.broadcastMessage(x+", "+z);
+        Bukkit.broadcastMessage(Tile.LOCATION_0.getBlockX()+", "+Tile.LOCATION_0.getBlockZ());
+        Bukkit.broadcastMessage(playerLoc.getBlockX()+", "+playerLoc.getBlockZ());
 
-        Bukkit.broadcastMessage(tile.toString()+"dsdjaskds");
-        if (tile.getLocations().contains(loc)) return tile;
-        else {
-            Set<Tile> s = tile.getNearTileList().get(1);
-            for(Tile t:s){
-                if(t.getLocations().contains(loc.getBlock().getType() == Material.CONCRETE)) return t;
+        Bukkit.broadcastMessage("__"+tile);*/
+
+        if (tile.getBlocks().contains(playerLoc.getBlock())) {
+            //ukkit.broadcastMessage("@@"+tile);
+            return tile;
+        } else {
+            for (int i = 1; i <= CHECK_SIZE; i++) {
+                Set<Tile> s = tile.getNearTileList().get(i);
+                for (Tile t : s) {
+                  //  Bukkit.broadcastMessage("____" + t);
+                    if (t.getBlocks().contains(playerLoc.getBlock())) {
+                      //  Bukkit.broadcastMessage("@@@@" + i);
+                        return t;
+                    }
+                }
             }
         }
-
-        return tile;
+        return null;
     }
 }
