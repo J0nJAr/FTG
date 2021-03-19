@@ -4,13 +4,16 @@ import jonjar.ftg.FTG;
 import jonjar.ftg.entity.PlayerInfo;
 import jonjar.ftg.entity.Tile;
 import jonjar.ftg.util.MsgSender;
-import org.bukkit.Location;
+
+import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+
+
 
 public class CommandManager extends MsgSender implements CommandExecutor {
 
@@ -107,8 +110,13 @@ public class CommandManager extends MsgSender implements CommandExecutor {
     }
 
     private void debug(Player p, String[] args) {
-
-        if(args.length>0){
+        if(args.length==1){
+            msg_cmt(p, getCmt_Click("setTile", new String[]{"debug", "setTile"}));
+            msg_cmt(p, getCmt_Click("register", new String[]{"debug", "register"}));
+            msg_cmt(p, getCmt_Click("testDistance", new String[]{"debug", "testDistance"}));
+            msg_cmt(p, getCmt_Click("RELOAD", ChatColor.DARK_RED+""+ChatColor.BOLD+"RELOAD" ,new String[]{"confirm"}));
+        }
+        else {
             switch (args[1]){
                 case "setTile":
                     for (Tile tile: Tile.TILE_SET) {
