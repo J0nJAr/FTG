@@ -1,8 +1,10 @@
 package jonjar.ftg.entity;
 
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Color;
 import org.bukkit.Material;
+import org.bukkit.boss.BarColor;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.LeatherArmorMeta;
 import org.bukkit.scoreboard.Scoreboard;
@@ -52,10 +54,11 @@ public class Team {
 
     private org.bukkit.scoreboard.Team team;
 
-    private List<Tile> tiles;
+    private final List<Tile> tiles;
 
     public Team(TeamColor tc){
         this.tc = tc;
+        this.tiles = new ArrayList<>();
 
         armors = new ItemStack[4];
         armors[0] = color(Material.LEATHER_HELMET);
@@ -85,6 +88,9 @@ public class Team {
         team.setCanSeeFriendlyInvisibles(true);
         team.setPrefix(tc.getChatColor() + "");
         team.setColor(tc.getChatColor());
+
+        Scoreboard sc = Bukkit.getScoreboardManager().getMainScoreboard();
+        sc.getObjective("tile").getScore(team.getName()).setScore(0);
     }
 
     public void unregister(){
@@ -109,10 +115,14 @@ public class Team {
     public void addTile(Tile tile){
         if(!tiles.contains(tile))
             tiles.add(tile);
+        tile.colorAll(this);
+        BOARD.getObjective("tile").getScore(team.getName()).setScore(tiles.size());
     }
 
     public void removeTile(Tile tile){
         tiles.remove(tile);
+        tile.colorAll(null);
+        BOARD.getObjective("tile").getScore(team.getName()).setScore(tiles.size());
     }
 
     private ItemStack color(Material mat){
@@ -126,22 +136,24 @@ public class Team {
 
     public enum TeamColor {
 
-        BLUE(ChatColor.AQUA, Color.BLUE ,11, "블루", 0, 12),
-        RED(ChatColor.RED, Color.RED, 14, "레드", 0, 0),
-        GREEN(ChatColor.GREEN, Color.GREEN, 5, "그린", -6, 6),
-        YELLOW(ChatColor.YELLOW, Color.YELLOW, 4, "옐로우",-6, 0),
-        ORANGE(ChatColor.GOLD, Color.ORANGE, 1, "오렌지", 6, 6),
-        PINK(ChatColor.LIGHT_PURPLE, Color.PURPLE, 6, "핑크", 6, 0);
+        BLUE(ChatColor.AQUA, BarColor.BLUE, Color.BLUE ,11, "블루", 0, 12),
+        RED(ChatColor.RED, BarColor.RED, Color.RED, 14, "레드", 0, 0),
+        GREEN(ChatColor.GREEN, BarColor.GREEN, Color.GREEN, 5, "그린", -6, 6),
+        YELLOW(ChatColor.YELLOW, BarColor.YELLOW, Color.YELLOW, 4, "옐로우",-6, 0),
+        WHITE(ChatColor.WHITE, BarColor.WHITE, Color.WHITE, 0, "화이트", 6, 6),
+        PINK(ChatColor.LIGHT_PURPLE, BarColor.PINK, Color.PURPLE, 6, "핑크", 6, 0);
 
         private final ChatColor cc;
+        private final BarColor bc;
         private final Color color;
         private final int data;
         private final String korean;
 
         private final int baseX;
         private final int baseZ;
-        TeamColor(ChatColor cc, Color color, int data, String korean, int x, int z){
+        TeamColor(ChatColor cc, BarColor bc, Color color, int data, String korean, int x, int z){
             this.cc = cc;
+            this.bc = bc;
             this.color = color;
             this.data = data;
             this.korean = korean;
@@ -153,6 +165,7 @@ public class Team {
         public int getBaseZ() { return this.baseZ; }
         public Color getColor() { return this.color; }
         public ChatColor getChatColor() { return this.cc; }
+        public BarColor getBarColor() { return this.bc; }
         public short getData() { return (short) this.data; }
 
         public String getKoreanName() {

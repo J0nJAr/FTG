@@ -4,11 +4,16 @@ import jonjar.ftg.FTG;
 import jonjar.ftg.entity.PlayerInfo;
 import jonjar.ftg.entity.Team;
 import jonjar.ftg.entity.Tile;
+import jonjar.ftg.util.LocationUtil;
 import jonjar.ftg.util.MsgSender;
+import net.md_5.bungee.api.ChatMessageType;
+import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.scoreboard.DisplaySlot;
+import org.bukkit.scoreboard.Scoreboard;
 
 public class GameManager extends MsgSender {
 
@@ -25,6 +30,8 @@ public class GameManager extends MsgSender {
     }
 
     public static GameState STATE = GameState.WAIT;
+
+    public final static int GAME_DURATION_SEC = 60 * 5;
 
     private int elapsed_tick;
     public static boolean PAUSE = false;
@@ -45,7 +52,7 @@ public class GameManager extends MsgSender {
 
             if(checkTeam()){
                 runnable = new GameManagerTask();
-                runnable.runTaskTimer(plugin, 0L, 20L);
+                runnable.runTaskTimer(plugin, 0L, 1L);
                 broadcast("§f§l" + p.getName() + "님께서 게임을 시작하셨습니다!");
                 STATE = GameState.READY;
             } else {
@@ -64,6 +71,12 @@ public class GameManager extends MsgSender {
             reset();
             broadcast("§c§l" + p.getName() + "님께서 게임을 강제 종료하셨습니다.");
         }
+    }
+
+    private void end(){
+        runnable.cancel();
+        runnable = null;
+        reset();
     }
     
     public void pause(Player p){
@@ -95,10 +108,16 @@ public class GameManager extends MsgSender {
             ap.getInventory().clear();
             ap.teleport(FTG.world.getSpawnLocation());
             ap.setGameMode(GameMode.ADVENTURE);
+            PlayerInfo pi = PlayerInfo.getPlayerInfo(ap);
+            pi.reset();
         }
 
         Team.resetAll();
         Tile.unregisterDummy();
+
+        Scoreboard sc = Bukkit.getScoreboardManager().getMainScoreboard();
+        if(sc.getObjective(DisplaySlot.SIDEBAR) != null)
+            sc.getObjective(DisplaySlot.SIDEBAR).setDisplaySlot(null);
 
         /*
         TODO :
@@ -121,14 +140,24 @@ public class GameManager extends MsgSender {
                 return;
             }
 
-            updatePlayers();
+            for(Player ap : Bukkit.getOnlinePlayers())
+                updatePlayer(ap);
         }
 
-        private void updatePlayers(){
-            // 액션바
-            for(Player ap : Bukkit.getOnlinePlayers()){
-
+        private void updatePlayer(Player p){
+            Scoreboard sc = p.getScoreboard();
+            if(sc == null){
+                sc = Bukkit.getScoreboardManager().getMainScoreboard();
+                p.setScoreboard(sc);
             }
+
+            // 액션바 제어
+            PlayerInfo pi = PlayerInfo.getPlayerInfo(p);
+            String text = pi.getTeam().getColor().getKoreanName() + "팀 | §f" + pi.getKill() + "킬 " + pi.getDeath() + "데스 " + pi.getTileAssisted() + "점령";
+            p.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText(text));
+
+            //
+
         }
     }
 
@@ -138,28 +167,45 @@ public class GameManager extends MsgSender {
             
             if(PAUSE)
                 return;
-            
+
+            if(elapsed_tick % 20 == 0){
+                int remain_sec = (GAME_DURATION_SEC * 20 - elapsed_tick + 200) / 20;
+                if(remain_sec % 60 == 0){
+                    broadcast("§e게임 종료까지 " + (remain_sec / 60) + "분 남았습니다.");
+                } else if(remain_sec == 30){
+                    broadcast("§c게임 종료까지 " + remain_sec + "초 남았습니다.");
+                } else if(remain_sec <= 10 && remain_sec > 0){
+                    broadcast("§c§l게임 종료까지 " + remain_sec + "초 남았습니다.");
+                } else if(remain_sec == 0){
+                    end();
+                }
+            }
+
+
             switch(elapsed_tick++){
-                case 20:
+                case 40:
                     broadcast("§f==================");
                     broadcast("§b땅따먹기 미니게임");
                     broadcast("§7제작 : KimBepo, macham");
                     broadcast("§f==================");
                     break;
-                case 40:
+                case 60:
                     broadcast("§7게임 설정 초기화 중...");
-                    Tile.registerTiles();
-
-                    break;
-                case 100:
-                    broadcast("§f초기화 완료. 3초 뒤 게임을 시작합니다.");
+                    Tile.registerDummy();
+                    for(Tile t : Tile.TILE_SET) {
+                        t.resetInfo();
+                    }
+                    Tile.registerMasterTiles();
                     break;
                 case 120:
+                    broadcast("§f초기화 완료. 3초 뒤 게임을 시작합니다.");
+                    break;
                 case 140:
                 case 160:
-                    broadcast("§c§l" + (9-elapsed_tick/20) + "초 전...");
-                    break;
                 case 180:
+                    broadcast("§c§l" + (10-elapsed_tick/20) + "초 전...");
+                    break;
+                case 200:
                     for(Player ap : Bukkit.getOnlinePlayers()) {
                         PlayerInfo pi = PlayerInfo.getPlayerInfo(ap);
                         pi.teleportBase();
@@ -168,6 +214,10 @@ public class GameManager extends MsgSender {
                     broadcast("§b§l게임 시작! 최대한 많은 땅을 점령하세요!");
                     main_task = new MainGameTask();
                     main_task.runTaskTimer(plugin, 5L, 5L);
+
+                    Bukkit.getScoreboardManager().getMainScoreboard().getObjective("tile").setDisplaySlot(DisplaySlot.SIDEBAR);
+                    break;
+                case GAME_DURATION_SEC * 20:
                     break;
             }
         }

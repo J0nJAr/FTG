@@ -12,8 +12,13 @@ import org.bukkit.World;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.scoreboard.DisplaySlot;
+import org.bukkit.scoreboard.Objective;
+import org.bukkit.scoreboard.Scoreboard;
 
 public final class FTG extends JavaPlugin {
+
+    public static FTG INSTANCE = null;
 
     private GameManager gm;
     private EventManager em;
@@ -36,6 +41,8 @@ public final class FTG extends JavaPlugin {
         if (worldName==null) worldName = "world";
         */
 
+        INSTANCE = this;
+
         world = Bukkit.getWorlds().get(0);
         Team.initScoreboardManager(Bukkit.getScoreboardManager().getMainScoreboard());
         cm = new CommandManager(this);
@@ -54,12 +61,22 @@ public final class FTG extends JavaPlugin {
         Bukkit.getPluginManager().registerEvents(em, this);
 
         getCommand("ftg").setExecutor(cm);
+        getCommand("ftg").setTabCompleter(tcm);
+        //getCommand("ftg").tabComplete(new TabCompleteManager());
+
+        Scoreboard sc = Bukkit.getScoreboardManager().getMainScoreboard();
+        if(sc.getObjective(DisplaySlot.SIDEBAR) != null)
+            sc.getObjective(DisplaySlot.SIDEBAR).unregister();
 
         for(Player ap : Bukkit.getOnlinePlayers()){
             new PlayerInfo(ap.getName(), ap.getUniqueId());
         }
-        getCommand("ftg").setTabCompleter(tcm);
-        //getCommand("ftg").tabComplete(new TabCompleteManager());
+
+        if(sc.getObjective("tile") == null){
+            Objective obj = sc.registerNewObjective("tile", "dummy");
+            obj.setDisplayName("§l점령한 타일");
+        }
+
     }
 
     @Override

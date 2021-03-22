@@ -59,7 +59,7 @@ public class TeamManager extends MsgSender{
                 List<Team.TeamColor> teams = new ArrayList<>();
                 switch(value){
                     case 6:
-                        teams.add(Team.TeamColor.ORANGE);
+                        teams.add(Team.TeamColor.WHITE);
                         teams.add(Team.TeamColor.YELLOW);
                         teams.add(Team.TeamColor.RED);
                         teams.add(Team.TeamColor.GREEN);
@@ -69,7 +69,7 @@ public class TeamManager extends MsgSender{
                     case 4:
                         teams.add(Team.TeamColor.GREEN);
                         teams.add(Team.TeamColor.YELLOW);
-                        teams.add(Team.TeamColor.ORANGE);
+                        teams.add(Team.TeamColor.WHITE);
                         teams.add(Team.TeamColor.PINK);
                         break;
                     case 3:

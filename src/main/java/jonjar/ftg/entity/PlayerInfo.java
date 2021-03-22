@@ -4,6 +4,9 @@ import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.boss.BarColor;
+import org.bukkit.boss.BarStyle;
+import org.bukkit.boss.BossBar;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -37,6 +40,8 @@ public class PlayerInfo {
     private int death = 0; // 데스
     private int tile_assist = 0; // 타일 점령 도움
 
+    private Tile nowLocation;
+
 
     public PlayerInfo(String name, UUID uuid){
         this.name = name;
@@ -44,10 +49,33 @@ public class PlayerInfo {
         PlayerInfoList.put(name.toLowerCase(), this);
     }
 
+    public int getKill(){ return kill; }
+    public int getDeath() { return death; }
+    public int getTileAssisted() { return this.tile_assist; }
+
+    public Tile getNowLocation() { return this.nowLocation; }
     public String getName() { return this.name; }
     public UUID getUUID() { return this.uuid; }
     public Team getTeam() { return this.team; }
     public boolean isObserver() { return this.observe; }
+
+    public void addTileAssisted() { this.tile_assist++; }
+
+    public void reset(){
+        this.kill = 0;
+        this.death = 0;
+        this.tile_assist = 0;
+    }
+
+    public void updateNowTile(Player p, Tile t){
+        if(nowLocation != null && nowLocation != t){
+            nowLocation.removePlayer(p);
+            nowLocation.removeBossBar(p);
+        }
+        this.nowLocation = t;
+        if(t != null)
+            nowLocation.addPlayer(p);
+    }
 
     public void setObserve(boolean observe){
         this.observe = observe;
@@ -67,16 +95,16 @@ public class PlayerInfo {
             leaveTeam();
         team.addPlayer(uuid);
         this.team = team;
+
+        if(Bukkit.getPlayer(uuid) != null)
+            Bukkit.getPlayer(uuid).setScoreboard(Bukkit.getScoreboardManager().getMainScoreboard());
     }
 
-    public void kill(Player target){
+    public void addKill(){
         kill++;
-
-        PlayerInfo pi = PlayerInfo.getPlayerInfo(target);
-        pi.death();
     }
 
-    public void death(){
+    public void addDeath(){
         death++;
     }
 

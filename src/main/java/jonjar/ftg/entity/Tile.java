@@ -2,11 +2,19 @@ package jonjar.ftg.entity;
 
 
 import jonjar.ftg.FTG;
+import jonjar.ftg.util.LocationUtil;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
+import org.bukkit.boss.BarColor;
+import org.bukkit.boss.BarStyle;
+import org.bukkit.boss.BossBar;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.EntityType;
+import org.bukkit.entity.Player;
+import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.scoreboard.Scoreboard;
 
 
 import java.util.*;
@@ -21,31 +29,84 @@ public class Tile {
 
 
     public static final Location LOCATION_0 =  new Location(FTG.world,153D,5D,-52D);
+    public static final int NEED_DOMINATE_TICK = 100;
 
     private ArrayList<Set<Tile>> nearTileList; //거리별 타일
     private HashMap<Tile,Integer> tileDistanceList;//타일별 거리
-
-
 
     public static TileMapC TILE_MAP= new TileMapC();
     public static Set<Tile> TILE_SET = new HashSet<>();
 
 
+    private final TileRunnable runnable;
+    private BossBar bar;
 
     private final Location center;
     public final int x_index, z_index;
     private ArmorStand centerDummy;
 
-    private Team.TeamColor own;
+    private Team own;
+    private Team attempt;
+    private boolean isMasterTile;
+
+    //
     private int state_tick = 0;
+
+    private final HashMap<Team, List<Player>> PlayerList;
 
     Tile(Location center, int x_index, int y_index){
         this.center = center;
         this.x_index=x_index;
         this.z_index=y_index;
 
+        this.bar = Bukkit.createBossBar("", BarColor.GREEN, BarStyle.SOLID);
+
+        this.isMasterTile = false;
+
         this.registerLocations();
         nearTileList = new ArrayList<>();
+        PlayerList = new HashMap<>();
+
+        this.runnable = new TileRunnable();
+        runnable.runTaskTimer(FTG.INSTANCE, 0L, 2L);
+    }
+
+    public boolean isMasterTile(){
+        return this.isMasterTile;
+    }
+    public Team getOwnTeam() { return this.own; }
+
+    public void setMasterTile(){
+        this.isMasterTile = true;
+    }
+
+    public void removeBossBar(Player p){
+        bar.removePlayer(p);
+    }
+
+    public void addPlayer(Player p){
+
+        PlayerInfo pi = PlayerInfo.getPlayerInfo(p);
+        if(pi.isObserver()) return;
+
+        Team tc = pi.getTeam();
+        if(!PlayerList.containsKey(tc))
+            PlayerList.put(tc, new ArrayList<>());
+
+        List<Player> list = PlayerList.get(tc);
+        if(!list.contains(p))
+            list.add(p);
+    }
+
+    public void removePlayer(Player p){
+        PlayerInfo pi = PlayerInfo.getPlayerInfo(p);
+        if(pi.isObserver()) return;
+
+        Team tc = pi.getTeam();
+        if(!PlayerList.containsKey(tc))
+            PlayerList.put(tc, new ArrayList<>());
+
+        PlayerList.get(tc).remove(p);
     }
 
     @Override
@@ -76,16 +137,42 @@ public class Tile {
         centerDummy = null;
     }
 
-    public void processOccupation(Team.TeamColor tc){
-        if(own != null && tc == own){
-            if(state_tick > -100)
-                state_tick--;
+    public void processOccupation(Team t){
+
+        if(own != null && own == t){
+            if(state_tick > 0) state_tick--;
+            return;
+        } else {
+
+
+            if(attempt != null && attempt == t)
+                state_tick++;
+            else {
+                state_tick = 0;
+                attempt = t;
+            }
         }
 
-        state_tick++;
-        if(state_tick == 100){
-            tc = own;
-            state_tick = -100;
+
+
+        if(state_tick == NEED_DOMINATE_TICK){
+            // 점령
+            attempt = null;
+            state_tick = 0;
+            if(own != null) {
+                own.removeTile(this);
+                own = null;
+            } else {
+                Team.TeamColor tc = t.getColor();
+                List<Player> players = PlayerList.get(t);
+                for(Player ap : players){
+                    PlayerInfo pi = PlayerInfo.getPlayerInfo(ap);
+                    pi.addTileAssisted();
+                }
+                own = t;
+                t.addTile(this);
+
+            }
         }
 
         /*
@@ -102,16 +189,29 @@ public class Tile {
 
     }
 
-    public void colorAll(Team.TeamColor tc){
-        Material mat = Material.CONCRETE;
-        short dura = tc != null ? tc.getData() : 0;
+    public void resetInfo(){
+        isMasterTile = false;
+        PlayerList.clear();
+        state_tick = 0;
+        own = null;
+        attempt = null;
+        bar.removeAll();
+        colorAll(null);
+    }
 
+    public void colorAll(Team t){
+        Material mat = Material.CONCRETE;
+        short dura = 8;
+        if(t != null){
+            Team.TeamColor tc = t.getColor();
+            dura = tc.getData();
+        }
+        own = t;
         for(Block b : getBlocks()){
             b.setType(mat);
             b.setData((byte) dura);
         }
 
-        own = tc;
     }
 
     public void registerLocations(){
@@ -272,6 +372,14 @@ public class Tile {
        }
     }
 
+    public static void registerMasterTiles(){
+        for(Team t : Team.getTeams()){
+            Tile tile = t.getColor().getBaseTile();
+            tile.colorAll(t);
+            tile.setMasterTile();
+        }
+    }
+
 
 
     public static class TileMapC{
@@ -300,5 +408,79 @@ public class Tile {
             if(isValid(x_index,z_index)) return map.get(x_index).get(z_index);
             else return map.get(0).get(0);
         }
+    }
+
+    public class TileRunnable extends BukkitRunnable {
+
+        private int tick = 0;
+
+
+        public TileRunnable(){
+
+        }
+
+        public void run(){
+
+            if(isMasterTile){
+                bar.setTitle(own.getColor().getKoreanName() + "팀§f의 본진 [점령 불가]");
+                bar.setProgress(1.0F);
+                return;
+            }
+
+            tick++;
+            if(PlayerList.isEmpty()) return;
+
+            boolean same = false;
+            Team dom = null;
+            Team dom2 = null;
+            int max = 0;
+            for(Team t : PlayerList.keySet()) {
+                if(t == null) continue;
+
+                boolean check = false;
+                for(Tile nt : getNearTileList().get(1)){
+                    if(nt.getOwnTeam() != null && nt.getOwnTeam() == t){
+                        check = true;
+                        break;
+                    }
+                }
+                if(!check)
+                    continue;
+
+                List<Player> in = PlayerList.get(t);
+                if (max < in.size()) {
+                    dom = t;
+                    max = in.size();
+                    same = false;
+                } else if (max > 0 && max == in.size()) {
+                    dom2 = t;
+                    same = true;
+                }
+                for (Player ap : in) {
+                    bar.addPlayer(ap);
+                }
+            }
+
+            if(own == null || (dom != null && own != dom)){
+                bar.setColor(same ? ((tick % 10) / 2 == 0 ? dom.getColor().getBarColor() : dom2.getColor().getBarColor())
+                        : (dom != null ? dom.getColor().getBarColor() : BarColor.PURPLE));
+                bar.setTitle(same ? dom.getColor().getChatColor() + ">> 대치" + dom2.getColor().getChatColor() + " 중 <<" : dom != null ? dom.getColor().getKoreanName() + "팀 §f점령 중..." : "§f빈 땅입니다.");
+            } else if(dom != null){
+                bar.setTitle(dom.getColor().getKoreanName() + "팀의 영토");
+                bar.setColor(dom.getColor().getBarColor());
+                bar.setProgress(1.0F);
+            }
+
+            float progress = (float) state_tick / (float) NEED_DOMINATE_TICK;
+            if(own != null){
+                progress = 1.0F - progress;
+            }
+            bar.setProgress(progress);
+
+            if(dom != null)
+                processOccupation(dom);
+
+        }
+
     }
 }

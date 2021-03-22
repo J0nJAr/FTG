@@ -16,13 +16,14 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
-import org.bukkit.event.player.PlayerJoinEvent;
-import org.bukkit.event.player.PlayerLoginEvent;
-import org.bukkit.event.player.PlayerMoveEvent;
+import org.bukkit.event.entity.PlayerDeathEvent;
+import org.bukkit.event.player.*;
 
 public class EventManager implements Listener {
 
     private final FTG main;
+
+    private final int TILES_Y = 5;
 
     public EventManager(FTG plugin){
         main = plugin;
@@ -60,33 +61,51 @@ public class EventManager implements Listener {
     }
 
     @EventHandler
+    public void onDeath(PlayerDeathEvent event){
+        if(GameManager.STATE != GameManager.GameState.START) return;
+        Player e = event.getEntity();
+        Player p = e.getKiller();
+        PlayerInfo ei = PlayerInfo.getPlayerInfo(e);
+        ei.addDeath();
+        if(p != null){
+            PlayerInfo pi = PlayerInfo.getPlayerInfo(p);
+            pi.addKill();
+        }
+        event.setKeepInventory(true);
+    }
+
+    @EventHandler
+    public void onRespawn(PlayerRespawnEvent event){
+        if(GameManager.STATE != GameManager.GameState.START) return;
+        Player e = event.getPlayer();
+        PlayerInfo ei = PlayerInfo.getPlayerInfo(e);
+        if(ei.getTeam() != null){
+            event.setRespawnLocation(ei.getTeam().getColor().getBaseTile().getCenter().clone().add(0, 1, 0));
+        }
+    }
+
+    @EventHandler
+    public void onQuit(PlayerQuitEvent event){
+        Player p = event.getPlayer();
+        PlayerInfo pi = PlayerInfo.getPlayerInfo(p);
+        pi.updateNowTile(p, null);
+    }
+
+    @EventHandler
     public void onMove(PlayerMoveEvent event){
         Player p = event.getPlayer();
+        PlayerInfo pi = PlayerInfo.getPlayerInfo(p);
         Location from = event.getFrom();
         Location to = event.getTo();
-        if(from.getX() != to.getX() || from.getZ() != to.getZ()){
+        if(from.getBlockX() != to.getBlockX() || from.getBlockZ() != to.getBlockZ()){
+            Material mat = to.getWorld().getBlockAt(to.getBlockX(), TILES_Y, to.getBlockZ()).getType();
 
-            Material mat = to.getWorld().getBlockAt(to.getBlockX(), 5, to.getBlockZ()).getType();
+            Tile t = null;
 
-            Tile t = LocationUtil.getClosestTile(to);
-
-            p.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText(t.toString()));
-
-            if(mat == Material.CONCRETE){
-                /*
-                Entity near = LocationUtil.getClosestEntityType(to, 10.0D, EntityType.ARMOR_STAND);
-                String name = near.getCustomName();
-
-                String[] split = name.split(",");
-                int x = Integer.parseInt(split[0]);
-
-
-               p.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText("§e" + x + " / " + z));
-               */
-
-            } else {
-                p.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText("§cNONE"));
+            if(mat == Material.CONCRETE) {
+                t = LocationUtil.getClosestTile(to);
             }
+            pi.updateNowTile(p, t);
 
         }
     }
