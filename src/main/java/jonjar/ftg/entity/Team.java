@@ -5,7 +5,6 @@ import org.bukkit.ChatColor;
 import org.bukkit.Color;
 import org.bukkit.Material;
 import org.bukkit.boss.BarColor;
-import org.bukkit.boss.BarColor;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.LeatherArmorMeta;
@@ -97,6 +96,11 @@ public class Team {
     }
 
     public void unregister(){
+        for(String uuid : team.getEntries()){
+            PlayerInfo pi = PlayerInfo.getPlayerInfoByUUID(uuid);
+            if(pi != null)
+                pi.leaveTeam();
+        }
         team.unregister();
         team = null;
     }

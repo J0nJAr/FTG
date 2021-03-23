@@ -27,6 +27,12 @@ public class PlayerInfo {
         return PlayerInfoList.get(p.getName().toLowerCase());
     }
     public static PlayerInfo getPlayerInfo(String name) { return PlayerInfoList.get(name.toLowerCase()); }
+    public static PlayerInfo getPlayerInfoByUUID(String uuid){
+        for(PlayerInfo pi : PlayerInfoList.values()){
+            if(pi.getUUID().toString().equalsIgnoreCase(uuid)) return pi;
+        }
+        return null;
+    }
 
 
     private final String name;

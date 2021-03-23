@@ -67,19 +67,18 @@ public class GameManager extends MsgSender {
         if(runnable == null || runnable.isCancelled()){
             error(p, "이미 게임이 종료되어있습니다.");
         } else {
-            runnable.cancel();
-            runnable = null;
-            reset();
+            end();
             broadcast("§c§l" + p.getName() + "님께서 게임을 강제 종료하셨습니다.");
         }
     }
 
     private void end(){
+        STATE = GameState.WAIT;
         runnable.cancel();
         runnable = null;
         reset();
     }
-    
+
     public void pause(Player p){
         if(runnable == null || runnable.isCancelled())
             error(p, "§c게임이 시작되어있지 않습니다.");
@@ -114,11 +113,12 @@ public class GameManager extends MsgSender {
         }
 
         Team.resetAll();
-        Tile.unregisterDummy();
 
         Scoreboard sc = Bukkit.getScoreboardManager().getMainScoreboard();
         if(sc.getObjective(DisplaySlot.SIDEBAR) != null)
             sc.getObjective(DisplaySlot.SIDEBAR).setDisplaySlot(null);
+
+
 
         /*
         TODO :
@@ -216,7 +216,7 @@ public class GameManager extends MsgSender {
                     broadcast("§b§l게임 시작! 최대한 많은 땅을 점령하세요!");
                     main_task = new MainGameTask();
                     main_task.runTaskTimer(plugin, 5L, 5L);
-
+                    STATE = GameState.START;
                     Bukkit.getScoreboardManager().getMainScoreboard().getObjective("tile").setDisplaySlot(DisplaySlot.SIDEBAR);
                     break;
                 case GAME_DURATION_SEC * 20:
