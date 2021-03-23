@@ -104,13 +104,7 @@ public class EventManager implements Listener {
         Location from = event.getFrom();
         Location to = event.getTo();
         if(from.getBlockX() != to.getBlockX() || from.getBlockZ() != to.getBlockZ()){
-            Material mat = to.getWorld().getBlockAt(to.getBlockX(), TILES_Y, to.getBlockZ()).getType();
-
-            Tile t = null;
-
-            if(mat == Material.CONCRETE) {
-                t = LocationUtil.getClosestTile(to);
-            }
+            Tile t = LocationUtil.getClosestTile(to);
             pi.updateNowTile(p, t);
 
         }
