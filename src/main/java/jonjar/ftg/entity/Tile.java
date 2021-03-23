@@ -409,7 +409,7 @@ public class Tile {
 
         public Tile getTile(int x_index,int z_index){
             if(isValid(x_index,z_index)) return map.get(x_index).get(z_index);
-            else return map.get(0).get(0);
+            else return null;
         }
     }
 
