@@ -9,6 +9,7 @@ import jonjar.ftg.manager.GameManager;
 import jonjar.ftg.manager.TabCompleteManager;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
+
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -83,6 +84,8 @@ public final class FTG extends JavaPlugin {
     public void onDisable() {
         Tile.unregisterDummy();
     }
+
+
 
     public GameManager getGameManager(){
         return this.gm;

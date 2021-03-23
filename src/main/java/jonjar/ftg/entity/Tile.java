@@ -1,6 +1,7 @@
 package jonjar.ftg.entity;
 
 
+
 import jonjar.ftg.FTG;
 import jonjar.ftg.util.LocationUtil;
 import org.bukkit.Bukkit;
@@ -242,6 +243,8 @@ public class Tile {
 
         return true;
     }
+
+    @Deprecated
     public boolean isAdjacent(int x_index,int z_index){
 
         if(isValid(x_index,z_index)) return false;

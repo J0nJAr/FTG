@@ -3,6 +3,7 @@ package jonjar.ftg.manager;
 import jonjar.ftg.FTG;
 import jonjar.ftg.entity.PlayerInfo;
 import jonjar.ftg.entity.Tile;
+import jonjar.ftg.util.LocationUtil;
 import jonjar.ftg.util.MsgSender;
 
 import net.md_5.bungee.api.chat.ClickEvent;
@@ -125,7 +126,8 @@ public class CommandManager extends MsgSender implements CommandExecutor {
                             append("=======").color(net.md_5.bungee.api.ChatColor.WHITE).create()));
             msg_cmt(p, getCmt_Click(ChatColor.GRAY +"setTile", new String[]{"debug", "setTile"}));
             msg_cmt(p, getCmt_Click(ChatColor.GRAY +"register", new String[]{"debug", "register"}));
-            msg_cmt(p, getCmt_Click(ChatColor.GRAY +"testDistance", new String[]{"debug", "testDistance"}));
+            msg_cmt(p, getCmt_Click(ChatColor.GRAY +"testDistance", new String[]{"debug", "testDistance","1"}));
+            msg_cmt(p, getCmt_Click(ChatColor.GRAY +"getTile", new String[]{"debug", "getTile"}));
             msg_cmt(p, getCmt_Click("RELOAD", ChatColor.DARK_RED+""+ChatColor.BOLD+"FORCE RELOAD" ,new String[]{"confirm"}));
         }
         else {
@@ -144,12 +146,19 @@ public class CommandManager extends MsgSender implements CommandExecutor {
                     msg(p, "거리 등록함");
                     break;
                 case "testDistance":
-                    Tile.TILE_MAP.getTile(0,11).registerNearTileList();
-
-                    for(int i = 0; i<8;i++){
+                    int d;
+                        try {
+                            d=Integer.parseInt(args[2]);
+                        }catch (Exception e){
+                            d = 1;
+                       }
+                    for (int i = 0; i<=d;i++){
                         msg(p, "=============="+i+"============");
-                        Tile.TILE_MAP.getTile(0,11).getNearTileList().get(i).forEach(s ->msg(p,s.toString()));
+                        LocationUtil.getClosestTile(p.getLocation()).getNearTileList().get(i).forEach(s ->msg(p,s.toString()));
                     }
+                    break;
+                case "getTile" :
+                    msg(p,LocationUtil.getClosestTile(p.getLocation()).toString());
                     break;
             }
         }
