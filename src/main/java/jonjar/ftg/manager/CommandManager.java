@@ -3,6 +3,7 @@ package jonjar.ftg.manager;
 import jonjar.ftg.FTG;
 import jonjar.ftg.entity.PlayerInfo;
 import jonjar.ftg.entity.Tile;
+import jonjar.ftg.util.ContainerUtil;
 import jonjar.ftg.util.LocationUtil;
 import jonjar.ftg.util.MsgSender;
 
@@ -10,8 +11,10 @@ import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.ChatColor;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
+import org.bukkit.block.Chest;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -117,7 +120,7 @@ public class CommandManager extends MsgSender implements CommandExecutor {
         }
     }
 
-    public final static List<String> CMD_DEBUG = Arrays.asList("setTile","register","testDistance","getTile");
+    public final static List<String> CMD_DEBUG = Arrays.asList("setTile","register","testDistance","getTile","getChest");
 
     private void debug(Player p, String[] args) {
         if(args.length==1){
@@ -128,6 +131,7 @@ public class CommandManager extends MsgSender implements CommandExecutor {
             msg_cmt(p, getCmt_Click(ChatColor.GRAY +"register", new String[]{"debug", "register"}));
             msg_cmt(p, getCmt_Click(ChatColor.GRAY +"testDistance", new String[]{"debug", "testDistance","1"}));
             msg_cmt(p, getCmt_Click(ChatColor.GRAY +"getTile", new String[]{"debug", "getTile"}));
+            msg_cmt(p, getCmt_Click(ChatColor.GRAY +"getChest", new String[]{"debug", "getChest"}));
             msg_cmt(p, getCmt_Click("RELOAD", ChatColor.DARK_RED+""+ChatColor.BOLD+"FORCE RELOAD" ,new String[]{"confirm"}));
         }
         else {
@@ -159,6 +163,10 @@ public class CommandManager extends MsgSender implements CommandExecutor {
                     break;
                 case "getTile" :
                     msg(p,LocationUtil.getClosestTile(p.getLocation()).toString());
+                    break;
+                case "getChest" :
+                    ContainerUtil.getInstance().setInventory(p,(Chest) new Location(FTG.world,-15,5,2).getBlock().getState());
+                    msg(p,"com");
                     break;
             }
         }
