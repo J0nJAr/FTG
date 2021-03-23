@@ -39,6 +39,8 @@ public class LocationUtil {
         int z = (int)Math.rint((location.getZ()-Math.abs(x*7))/14);
 
         Tile tile = Tile.TILE_MAP.getTile(x, z);
+
+        if(tile==null) return null;
 /*
         Bukkit.broadcastMessage("========================================");
         Bukkit.broadcastMessage(x+", "+z);
