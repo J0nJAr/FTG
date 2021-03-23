@@ -1,5 +1,6 @@
 package jonjar.ftg.entity;
 
+import jonjar.ftg.util.ContainerUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
@@ -114,15 +115,21 @@ public class PlayerInfo {
         if(this.team == null || Bukkit.getPlayer(uuid) == null) return;
 
         Player p = Bukkit.getPlayer(uuid);
+
         if(reset){
             p.getInventory().clear();
             p.setGameMode(GameMode.ADVENTURE);
             p.setHealth(20.0D);
         }
 
-        p.getInventory().addItem(new ItemStack(Material.WOOD_SWORD));
-        p.getInventory().setArmorContents(team.getArmors());
-        p.updateInventory();
+
+        ContainerUtil.getInstance().setInventory(p,team.getColor().getInventory());
+
+        /*
+         p.getInventory().addItem(new ItemStack(Material.WOOD_SWORD));
+         p.getInventory().setArmorContents(team.getArmors());
+         p.updateInventory();
+        */
     }
 
     public void teleportBase(){

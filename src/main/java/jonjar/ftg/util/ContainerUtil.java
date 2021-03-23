@@ -5,12 +5,9 @@ import jonjar.ftg.FTG;
 import jonjar.ftg.entity.Team;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.block.Block;
 import org.bukkit.block.Chest;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 
 import java.util.HashMap;
@@ -31,13 +28,18 @@ public class ContainerUtil {
     }
 
     public void registerAllInventory(){
-        Location location = LOCATION_CONTAINER.clone();
-        location.add(0,-1,0);
+        Location _color =LOCATION_CONTAINER.clone();
+        Location _chest = LOCATION_CONTAINER.clone();
+        _color.add(0,-1,0);
+        for(int i=0;i<Team.TeamColor.values().length;i++){
         for(Team.TeamColor tc : Team.TeamColor.values()) {
-            location.add(0,0,2);
-            if(tc.getData()==location.getBlock().getData()){
-                tc.setInventory(((Chest)location.getBlock().getState()).getInventory());
+            if(tc.getData()==_color.getBlock().getData()){
+                Chest chest = (Chest)(_chest).getBlock().getState();
+                tc.setInventory(chest.getInventory());
+                }
             }
+        _chest.add(0,0,2);
+        _color.add(0,0,2);
         }
     }
 
@@ -50,8 +52,6 @@ public class ContainerUtil {
        // if(!(b instanceof Chest)) return;
         PlayerInventory pi = p.getInventory();
         for(int i =0; i<=40 ; i++) {
-            Bukkit.broadcastMessage(i+"");
-            if(inv.getItem(i)!=null) Bukkit.broadcastMessage(inv.getItem(i).getType().toString());
             pi.setItem(i,inv.getItem(i));
         }
     }
