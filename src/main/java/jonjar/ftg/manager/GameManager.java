@@ -4,6 +4,7 @@ import jonjar.ftg.FTG;
 import jonjar.ftg.entity.PlayerInfo;
 import jonjar.ftg.entity.Team;
 import jonjar.ftg.entity.Tile;
+import jonjar.ftg.util.ContainerUtil;
 import jonjar.ftg.util.LocationUtil;
 import jonjar.ftg.util.MsgSender;
 import net.md_5.bungee.api.ChatMessageType;
@@ -196,6 +197,7 @@ public class GameManager extends MsgSender {
                         t.resetInfo();
                     }
                     Tile.registerMasterTiles();
+                    ContainerUtil.getInstance().registerAllInventory();
                     break;
                 case 120:
                     broadcast("§f초기화 완료. 3초 뒤 게임을 시작합니다.");

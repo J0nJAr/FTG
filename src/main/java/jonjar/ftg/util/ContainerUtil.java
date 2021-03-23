@@ -20,7 +20,6 @@ public class ContainerUtil {
 
     Location LOCATION_CONTAINER;
     static ContainerUtil c;
-    Map<Team.TeamColor,Inventory> InventoryMap;
 
     private ContainerUtil(){
         LOCATION_CONTAINER = new Location(FTG.world,-15,5,2);
@@ -31,21 +30,24 @@ public class ContainerUtil {
         return c;
     }
 
-    private void registerInventory(){
-        InventoryMap = new HashMap<>();
+    public void registerAllInventory(){
         Location location = LOCATION_CONTAINER.clone();
         location.add(0,-1,0);
         for(Team.TeamColor tc : Team.TeamColor.values()) {
             location.add(0,0,2);
             if(tc.getData()==location.getBlock().getData()){
-                InventoryMap.put(tc,((Chest)location.getBlock().getState()).getInventory());
+                tc.setInventory(((Chest)location.getBlock().getState()).getInventory());
             }
         }
     }
 
     public void setInventory(Player p, Chest c){
+        // if(!(b instanceof Chest)) return;
+        setInventory(p,c.getInventory());
+    }
+
+    public void setInventory(Player p, Inventory inv){
        // if(!(b instanceof Chest)) return;
-        Inventory inv = c.getInventory();
         PlayerInventory pi = p.getInventory();
         for(int i =0; i<=40 ; i++) {
             Bukkit.broadcastMessage(i+"");

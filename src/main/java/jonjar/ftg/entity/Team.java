@@ -5,6 +5,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.Color;
 import org.bukkit.Material;
 import org.bukkit.boss.BarColor;
+import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.LeatherArmorMeta;
 import org.bukkit.scoreboard.Scoreboard;
@@ -151,6 +152,9 @@ public class Team {
 
         private final int baseX;
         private final int baseZ;
+
+        private Inventory inv;
+
         TeamColor(ChatColor cc, BarColor bc, Color color, int data, String korean, int x, int z){
             this.cc = cc;
             this.bc = bc;
@@ -159,6 +163,13 @@ public class Team {
             this.korean = korean;
             this.baseX = x;
             this.baseZ = z;
+        }
+        public void setInventory(Inventory inv){
+            this.inv = inv;
+        }
+
+        public Inventory getInventory(){
+            return inv;
         }
 
         public int getBaseX() { return this.baseX; }
