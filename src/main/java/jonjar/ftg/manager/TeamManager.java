@@ -25,6 +25,12 @@ public class TeamManager extends MsgSender{
     }
 
     public void random(Player p, String[] args){
+
+        if(Team.getTeams().isEmpty()){
+            error(p, "§c먼저 /msg team setting 명령어로 팀을 세팅해주세요.");
+            return;
+        }
+
         // 1. 관전자 걸러내기
         List<Player> PlayerList = Bukkit.getOnlinePlayers().stream().filter(ap -> !PlayerInfo.getPlayerInfo(ap).isObserver()).collect(Collectors.toList());
 

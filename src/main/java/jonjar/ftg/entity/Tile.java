@@ -1,10 +1,11 @@
 package jonjar.ftg.entity;
 
 
-
 import jonjar.ftg.FTG;
 import jonjar.ftg.util.LocationUtil;
 import org.bukkit.Bukkit;
+
+
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -30,10 +31,12 @@ public class Tile {
 
 
     public static final Location LOCATION_0 =  new Location(FTG.world,153D,5D,-52D);
-    public static final int NEED_DOMINATE_TICK = 100;
+    public static final int NEED_DOMINATE_TICK = 50;
 
     private ArrayList<Set<Tile>> nearTileList; //거리별 타일
     private HashMap<Tile,Integer> tileDistanceList;//타일별 거리
+
+
 
     public static TileMapC TILE_MAP= new TileMapC();
     public static Set<Tile> TILE_SET = new HashSet<>();
@@ -465,7 +468,7 @@ public class Tile {
             }
 
             if(own == null || (dom != null && own != dom)){
-                bar.setColor(same ? ((tick % 10) / 2 == 0 ? dom.getColor().getBarColor() : dom2.getColor().getBarColor())
+                bar.setColor(same ? ((tick / 10) % 2 == 0 ? dom.getColor().getBarColor() : dom2.getColor().getBarColor())
                         : (dom != null ? dom.getColor().getBarColor() : BarColor.PURPLE));
                 bar.setTitle(same ? dom.getColor().getChatColor() + ">> 대치" + dom2.getColor().getChatColor() + " 중 <<" : dom != null ? dom.getColor().getKoreanName() + "팀 §f점령 중..." : "§f빈 땅입니다.");
             } else if(dom != null){
@@ -480,7 +483,7 @@ public class Tile {
             }
             bar.setProgress(progress);
 
-            if(dom != null)
+            if(dom != null && dom2 == null)
                 processOccupation(dom);
 
         }

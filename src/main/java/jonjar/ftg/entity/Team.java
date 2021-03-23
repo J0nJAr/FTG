@@ -5,6 +5,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.Color;
 import org.bukkit.Material;
 import org.bukkit.boss.BarColor;
+import org.bukkit.boss.BarColor;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.LeatherArmorMeta;
@@ -62,10 +63,10 @@ public class Team {
         this.tiles = new ArrayList<>();
 
         armors = new ItemStack[4];
-        armors[0] = color(Material.LEATHER_HELMET);
-        armors[1] = color(Material.LEATHER_CHESTPLATE);
-        armors[2] = color(Material.LEATHER_LEGGINGS);
-        armors[3] = color(Material.LEATHER_BOOTS);
+        armors[3] = color(Material.LEATHER_HELMET);
+        armors[2] = color(Material.LEATHER_CHESTPLATE);
+        armors[1] = color(Material.LEATHER_LEGGINGS);
+        armors[0] = color(Material.LEATHER_BOOTS);
 
         TeamList.add(this);
     }

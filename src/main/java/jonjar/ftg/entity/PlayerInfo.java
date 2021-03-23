@@ -120,6 +120,7 @@ public class PlayerInfo {
             p.getInventory().clear();
             p.setGameMode(GameMode.ADVENTURE);
             p.setHealth(20.0D);
+            p.setFoodLevel(20);
         }
 
 

@@ -16,6 +16,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.event.entity.FoodLevelChangeEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.*;
 
@@ -58,6 +59,11 @@ public class EventManager implements Listener {
         if(pi == null){
             new PlayerInfo(p.getName(), p.getUniqueId());
         }
+    }
+
+    @EventHandler
+    public void onHunger(FoodLevelChangeEvent event){
+        event.setCancelled(true);
     }
 
     @EventHandler
