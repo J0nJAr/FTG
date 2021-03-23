@@ -117,7 +117,7 @@ public class CommandManager extends MsgSender implements CommandExecutor {
         }
     }
 
-    public final static List<String> CMD_DEBUG = Arrays.asList("setTile","register","testDistance");
+    public final static List<String> CMD_DEBUG = Arrays.asList("setTile","register","testDistance","getTile");
 
     private void debug(Player p, String[] args) {
         if(args.length==1){

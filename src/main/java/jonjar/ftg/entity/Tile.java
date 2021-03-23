@@ -286,8 +286,7 @@ public class Tile {
             int size = q.size();
             for(int i=0;i<size;i++) {
                 int[] _x = { 1, 1, 0, 0,-1,-1};
-                int[] _z = {-1, 0,-1, 1, 0, 1};//상부
-                int[] __z = {0, 1,-1, 1, -1, 0};//하부
+                int[] _z = {-1, 0,-1, 1, 0, 1};
                // Bukkit.broadcastMessage("---:"+i+"---");
                 Tile tile = q.poll();
                 for (int j=0;j<6;j++) {
@@ -295,7 +294,8 @@ public class Tile {
                         int x;
                         x = tile.x_index + _x[j];
                         if(x>0) z = tile.z_index + _z[j];
-                        else z = tile.z_index + __z[j];
+                        else if (x==0&&_x[j]!=0) z= tile.z_index + Math.abs(_z[j]);
+                        else z = tile.z_index - _z[j];
                     //    Bukkit.broadcastMessage("x, z"+x+","+z);
 
                         if (isValid(x,z)&&!visited[6 + x][z]) {
