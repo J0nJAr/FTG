@@ -43,6 +43,7 @@ public class Team {
     public static List<Team> getTeams(){
         return TeamList;
     }
+    public static List<String> TeamNames;
 
     public static void resetAll(){
         for(Team t : TeamList)
@@ -67,7 +68,7 @@ public class Team {
         armors[2] = color(Material.LEATHER_CHESTPLATE);
         armors[1] = color(Material.LEATHER_LEGGINGS);
         armors[0] = color(Material.LEATHER_BOOTS);
-
+        TeamNames.add(this.getColor().name());
         TeamList.add(this);
     }
 

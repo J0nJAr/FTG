@@ -63,6 +63,7 @@ public class TeamManager extends MsgSender{
                 Team.resetAll();
 
                 List<Team.TeamColor> teams = new ArrayList<>();
+                Team.TeamNames = new ArrayList<>();
                 switch(value){
                     case 6:
                         teams.add(Team.TeamColor.WHITE);
