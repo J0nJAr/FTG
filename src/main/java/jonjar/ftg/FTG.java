@@ -57,7 +57,6 @@ public final class FTG extends JavaPlugin {
             if(e.getCustomName() != null)
                 e.remove();
         }
-        Tile.registerDummy();
 
         Bukkit.getPluginManager().registerEvents(em, this);
 
@@ -82,7 +81,6 @@ public final class FTG extends JavaPlugin {
 
     @Override
     public void onDisable() {
-        Tile.unregisterDummy();
     }
 
 

@@ -2,6 +2,7 @@ package jonjar.ftg.manager;
 
 import jonjar.ftg.FTG;
 import jonjar.ftg.entity.PlayerInfo;
+import jonjar.ftg.entity.Team;
 import jonjar.ftg.entity.Tile;
 import jonjar.ftg.util.ContainerUtil;
 import jonjar.ftg.util.LocationUtil;
@@ -120,7 +121,7 @@ public class CommandManager extends MsgSender implements CommandExecutor {
         }
     }
 
-    public final static List<String> CMD_DEBUG = Arrays.asList("setTile","register","testDistance","getTile","getChest");
+    public final static List<String> CMD_DEBUG = Arrays.asList("setTile","register","testDistance","getTile","getChest", "fastStart");
 
     private void debug(Player p, String[] args) {
         if(args.length==1){
@@ -132,10 +133,21 @@ public class CommandManager extends MsgSender implements CommandExecutor {
             msg_cmt(p, getCmt_Click(ChatColor.GRAY +"testDistance", new String[]{"debug", "testDistance","1"}));
             msg_cmt(p, getCmt_Click(ChatColor.GRAY +"getTile", new String[]{"debug", "getTile"}));
             msg_cmt(p, getCmt_Click(ChatColor.GRAY +"getChest", new String[]{"debug", "getChest"}));
+            msg_cmt(p, getCmt_Click(ChatColor.GRAY + "fastStart 2", new String[]{"debug", "fastStart", "2"}));
+            msg_cmt(p, getCmt_Click(ChatColor.GRAY + "fastStart 3", new String[]{"debug", "fastStart", "3"}));
             msg_cmt(p, getCmt_Click("RELOAD", ChatColor.DARK_RED+""+ChatColor.BOLD+"FORCE RELOAD" ,new String[]{"confirm"}));
         }
         else {
             switch (args[1]){
+                case "getInfos":
+                    Tile t = PlayerInfo.getPlayerInfo(p).getNowLocation();
+                    t.printAll();
+                    break;
+                case "fastStart":
+                    p.chat("/ftg team setting " + args[2]);
+                    p.chat("/ftg team random");
+                    p.chat("/ftg start");
+                    break;
                 case "setTile":
                     for (Tile tile: Tile.TILE_SET) {
                         for(Block bl:tile.getBlocks()){
@@ -148,6 +160,9 @@ public class CommandManager extends MsgSender implements CommandExecutor {
                     msg(p, "타일 등록함");
                     Tile.registerAllNearTileList();
                     msg(p, "거리 등록함");
+                    break;
+                case "armor":
+                    p.getInventory().addItem(Team.getTeamByColor(Team.TeamColor.valueOf(args[2])).getArmors());
                     break;
                 case "testDistance":
                     int d;

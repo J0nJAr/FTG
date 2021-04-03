@@ -49,6 +49,9 @@ public class EventManager implements Listener {
         if(event.getEntity() instanceof Player){
             if(GameManager.STATE != GameManager.GameState.START)
                 event.setCancelled(true);
+            Player e = (Player) event.getEntity();
+            if(PlayerInfo.getPlayerInfo(e).isDead())
+                event.setCancelled(true);
         }
     }
 
@@ -72,11 +75,13 @@ public class EventManager implements Listener {
         Player e = event.getEntity();
         Player p = e.getKiller();
         PlayerInfo ei = PlayerInfo.getPlayerInfo(e);
-        ei.addDeath();
+        ei.onDeath();
+
         if(p != null){
             PlayerInfo pi = PlayerInfo.getPlayerInfo(p);
             pi.addKill();
         }
+        e.setHealth(20D);
         event.setKeepInventory(true);
     }
 
@@ -106,7 +111,6 @@ public class EventManager implements Listener {
         if(from.getBlockX() != to.getBlockX() || from.getBlockZ() != to.getBlockZ()){
             Tile t = LocationUtil.getClosestTile(to);
             pi.updateNowTile(p, t);
-
         }
     }
 

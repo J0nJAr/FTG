@@ -8,6 +8,8 @@ import org.bukkit.boss.BarColor;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.LeatherArmorMeta;
+import org.bukkit.scoreboard.DisplaySlot;
+import org.bukkit.scoreboard.Objective;
 import org.bukkit.scoreboard.Scoreboard;
 
 import java.util.ArrayList;
@@ -45,6 +47,12 @@ public class Team {
     public static List<String> TeamNames;
 
     public static void resetAll(){
+
+        Scoreboard sc = Bukkit.getScoreboardManager().getMainScoreboard();
+        sc.getObjective("tile").unregister();
+        Objective obj = sc.registerNewObjective("tile", "dummy");
+        obj.setDisplayName("§l점령한 타일");
+
         for(Team t : TeamList)
             t.unregister();
         TeamList.clear();
@@ -92,7 +100,7 @@ public class Team {
         team.setColor(tc.getChatColor());
 
         Scoreboard sc = Bukkit.getScoreboardManager().getMainScoreboard();
-        sc.getObjective("tile").getScore(team.getName()).setScore(0);
+        sc.getObjective("tile").getScore(team.getColor() + team.getName()).setScore(0);
     }
 
     public void unregister(){
@@ -101,6 +109,9 @@ public class Team {
             if(pi != null)
                 pi.leaveTeam();
         }
+
+
+
         team.unregister();
         team = null;
     }
@@ -123,13 +134,13 @@ public class Team {
         if(!tiles.contains(tile))
             tiles.add(tile);
         tile.colorAll(this);
-        BOARD.getObjective("tile").getScore(team.getName()).setScore(tiles.size());
+        BOARD.getObjective("tile").getScore(team.getColor() + team.getName()).setScore(tiles.size());
     }
 
     public void removeTile(Tile tile){
         tiles.remove(tile);
         tile.colorAll(null);
-        BOARD.getObjective("tile").getScore(team.getName()).setScore(tiles.size());
+        BOARD.getObjective("tile").getScore(team.getColor() + team.getName()).setScore(tiles.size());
     }
 
     private ItemStack color(Material mat){

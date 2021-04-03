@@ -1,5 +1,7 @@
 package jonjar.ftg.entity;
 
+import jonjar.ftg.FTG;
+import jonjar.ftg.manager.GameManager;
 import jonjar.ftg.util.ContainerUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
@@ -12,6 +14,7 @@ import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.scheduler.BukkitRunnable;
 
 import java.lang.reflect.Array;
 import java.util.ArrayList;
@@ -20,6 +23,8 @@ import java.util.List;
 import java.util.UUID;
 
 public class PlayerInfo {
+
+    public final static int RESPWAN_TICK = 100;
 
     private static HashMap<String, PlayerInfo> PlayerInfoList = new HashMap<>();
 
@@ -39,6 +44,7 @@ public class PlayerInfo {
     private final UUID uuid;
 
     private boolean observe = false;
+    private boolean isDead = false;
     private Team team;
 
 
@@ -65,16 +71,67 @@ public class PlayerInfo {
     public UUID getUUID() { return this.uuid; }
     public Team getTeam() { return this.team; }
     public boolean isObserver() { return this.observe; }
+    public boolean isDead() { return this.isDead; }
 
     public void addTileAssisted() { this.tile_assist++; }
 
-    public void reset(){
+    public void reset() {
         this.kill = 0;
         this.death = 0;
         this.tile_assist = 0;
     }
 
+    public void onDeath(){
+        addDeath();
+
+        Player p = Bukkit.getPlayer(uuid);
+        p.setGameMode(GameMode.SPECTATOR);
+        if(nowLocation != null){
+            nowLocation.removePlayer(p);
+            nowLocation.removeBossBar(p);
+        }
+        nowLocation = null;
+        isDead = true;
+
+        new BukkitRunnable() {
+            private int tick = RESPWAN_TICK;
+            public void run(){
+
+                if(GameManager.STATE != GameManager.GameState.START){
+                    this.cancel();
+                    return;
+                }
+
+                if(!p.isOnline())
+                    return;
+
+                tick--;
+
+                if(tick % 20 == 0){
+                    p.sendTitle("", "§e" + tick/20 + "§f초 뒤 리스폰됩니다.", 0, 24, 0);
+                }
+
+                if(tick == 0){
+                    this.cancel();
+                    equipKits(true);
+                    teleportBase();
+                    isDead = false;
+                }
+            }
+        }.runTaskTimer(FTG.INSTANCE, 0L, 1L);
+    }
+
     public void updateNowTile(Player p, Tile t){
+
+        if(isDead){
+            if(nowLocation != null){
+                nowLocation.removePlayer(p);
+                nowLocation.removeBossBar(p);
+            }
+            nowLocation = null;
+            return;
+        }
+
         if(nowLocation != null && nowLocation != t){
             nowLocation.removePlayer(p);
             nowLocation.removeBossBar(p);

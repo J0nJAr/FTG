@@ -14,6 +14,7 @@ import org.bukkit.GameMode;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scoreboard.DisplaySlot;
+import org.bukkit.scoreboard.Objective;
 import org.bukkit.scoreboard.Scoreboard;
 
 public class GameManager extends MsgSender {
@@ -32,7 +33,7 @@ public class GameManager extends MsgSender {
 
     public static GameState STATE = GameState.WAIT;
 
-    public final static int GAME_DURATION_SEC = 60 * 5;
+    public final static int GAME_DURATION_SEC = 5;
 
     private int elapsed_tick;
     public static boolean PAUSE = false;
@@ -118,8 +119,6 @@ public class GameManager extends MsgSender {
         if(sc.getObjective(DisplaySlot.SIDEBAR) != null)
             sc.getObjective(DisplaySlot.SIDEBAR).setDisplaySlot(null);
 
-
-
         /*
         TODO :
         1. 플레이어 모두 티피올 O
@@ -147,10 +146,14 @@ public class GameManager extends MsgSender {
 
         private void updatePlayer(Player p){
             Scoreboard sc = p.getScoreboard();
+
             if(sc == null){
                 sc = Bukkit.getScoreboardManager().getMainScoreboard();
                 p.setScoreboard(sc);
             }
+
+            if(PlayerInfo.getPlayerInfo(p).isObserver())
+                return;
 
             // 액션바 제어
             PlayerInfo pi = PlayerInfo.getPlayerInfo(p);
@@ -171,17 +174,44 @@ public class GameManager extends MsgSender {
 
             if(elapsed_tick % 20 == 0){
                 int remain_sec = (GAME_DURATION_SEC * 20 - elapsed_tick + 200) / 20;
-                if(remain_sec % 60 == 0){
-                    broadcast("§e게임 종료까지 " + (remain_sec / 60) + "분 남았습니다.");
-                } else if(remain_sec == 30){
-                    broadcast("§c게임 종료까지 " + remain_sec + "초 남았습니다.");
+                if(remain_sec == 0){
+                    broadcast("============================");
+                    Team winner = null;
+                    int max = 0;
+                    Objective obj = Bukkit.getScoreboardManager().getMainScoreboard().getObjective("tile");
+                    for(Team t : Team.getTeams()){
+                        if(winner == null){
+                            winner = t;
+                            max = obj.getScore(t.getColor().getChatColor() + t.getTeam().getName()).getScore();
+                        } else {
+                            int i = obj.getScore(t.getTeam().getColor() + t.getTeam().getName()).getScore();
+                            if(max > i){
+                                winner = t;
+                                max = i;
+                            } else if(max == i){
+                                winner = null;
+                                break;
+                            }
+                            // TODO : 동점 시 그... 뭐드라? 리스폰 금지압수
+                        }
+                    }
+                    if(winner == null){
+                        broadcast("우승 팀 : 무승부!");
+                    } else {
+                        broadcast("우승 팀 : " + winner.getColor().getKoreanName());
+                    }
+
+                    broadcast("============================");
+                    end();
+                    return;
                 } else if(remain_sec <= 10 && remain_sec > 0){
                     broadcast("§c§l게임 종료까지 " + remain_sec + "초 남았습니다.");
-                } else if(remain_sec == 0){
-                    end();
+                } else if(remain_sec == 30){
+                    broadcast("§c게임 종료까지 " + remain_sec + "초 남았습니다.");
+                } else if(remain_sec % 60 == 0){
+                    broadcast("§e게임 종료까지 " + (remain_sec / 60) + "분 남았습니다.");
                 }
             }
-
 
             switch(elapsed_tick++){
                 case 40:
@@ -192,7 +222,6 @@ public class GameManager extends MsgSender {
                     break;
                 case 60:
                     broadcast("§7게임 설정 초기화 중...");
-                    Tile.registerDummy();
                     for(Tile t : Tile.TILE_SET) {
                         t.resetInfo();
                     }
@@ -218,8 +247,6 @@ public class GameManager extends MsgSender {
                     main_task.runTaskTimer(plugin, 5L, 5L);
                     STATE = GameState.START;
                     Bukkit.getScoreboardManager().getMainScoreboard().getObjective("tile").setDisplaySlot(DisplaySlot.SIDEBAR);
-                    break;
-                case GAME_DURATION_SEC * 20:
                     break;
             }
         }

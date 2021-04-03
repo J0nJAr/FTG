@@ -9,6 +9,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
+import org.bukkit.block.BlockFace;
 import org.bukkit.boss.BarColor;
 import org.bukkit.boss.BarStyle;
 import org.bukkit.boss.BossBar;
@@ -28,10 +29,11 @@ public class Tile {
 
     private Set<Location> locationSet;
     private Set<Block> blockSet;
+    private Set<Block> belowblockSet;
 
 
     public static final Location LOCATION_0 =  new Location(FTG.world,153D,5D,-52D);
-    public static final int NEED_DOMINATE_TICK = 50;
+    public static final int NEED_DOMINATE_TICK = 20;
 
     private ArrayList<Set<Tile>> nearTileList; //거리별 타일
     private HashMap<Tile,Integer> tileDistanceList;//타일별 거리
@@ -47,7 +49,6 @@ public class Tile {
 
     private final Location center;
     public final int x_index, z_index;
-    private ArmorStand centerDummy;
 
     private Team own;
     private Team attempt;
@@ -73,6 +74,21 @@ public class Tile {
 
         this.runnable = new TileRunnable();
         runnable.runTaskTimer(FTG.INSTANCE, 0L, 2L);
+    }
+
+    public void printAll(){
+        Bukkit.broadcastMessage("=== tiles info ===");
+        Bukkit.broadcastMessage("own : " + own);
+        Bukkit.broadcastMessage("attempt : " + attempt);
+        Bukkit.broadcastMessage("state : " + state_tick);
+
+        for(Team t : PlayerList.keySet()){
+            Bukkit.broadcastMessage("PlayerList : ");
+            for(Player ap : PlayerList.get(t)){
+                Bukkit.broadcastMessage("- " + ap.getName());
+            }
+        }
+
     }
 
     public boolean isMasterTile(){
@@ -120,25 +136,12 @@ public class Tile {
 
     public Set<Block> getBlocks(){
         if(this.blockSet == null){//아직 블럭 set가 없으면 생성
-            blockSet = new HashSet<Block>();
+            blockSet = new HashSet<>();
+            belowblockSet = new HashSet<>();
             this.getLocations().forEach(l -> blockSet.add(l.getBlock()));
+            this.getLocations().forEach(l -> belowblockSet.add(l.getBlock().getRelative(BlockFace.DOWN)));
         }
         return blockSet;
-    }
-
-    public void spawnDummy(){
-        ArmorStand as = (ArmorStand) center.getWorld().spawnEntity(center.clone().add(0, -2, 0), EntityType.ARMOR_STAND);
-        as.setGravity(false);
-        as.setInvulnerable(true);
-        as.setVisible(false);
-        as.setCustomName(this.toString());
-        as.setCustomNameVisible(false);
-        centerDummy = as;
-    }
-
-    public void killDummy(){
-        centerDummy.remove();
-        centerDummy = null;
     }
 
     public void processOccupation(Team t){
@@ -147,13 +150,16 @@ public class Tile {
             if(state_tick > 0) state_tick--;
             return;
         } else {
-
-
             if(attempt != null && attempt == t)
                 state_tick++;
             else {
                 state_tick = 0;
                 attempt = t;
+                // 색깔 바뀌게.
+                if(own == null)
+                    colorAll(attempt, true);
+                else
+                    colorAll(own, true);
             }
         }
 
@@ -167,7 +173,6 @@ public class Tile {
                 own.removeTile(this);
                 own = null;
             } else {
-                Team.TeamColor tc = t.getColor();
                 List<Player> players = PlayerList.get(t);
                 for(Player ap : players){
                     PlayerInfo pi = PlayerInfo.getPlayerInfo(ap);
@@ -204,18 +209,71 @@ public class Tile {
     }
 
     public void colorAll(Team t){
-        Material mat = Material.CONCRETE;
+        colorAll(t, false);
+    }
+
+    public void colorAll(Team t, boolean onProgress){
+        Material mat = !onProgress ? Material.CONCRETE : Material.STAINED_GLASS;
         short dura = 8;
         if(t != null){
             Team.TeamColor tc = t.getColor();
             dura = tc.getData();
         }
-        own = t;
+        if(!onProgress)
+            own = t;
         for(Block b : getBlocks()){
             b.setType(mat);
             b.setData((byte) dura);
         }
 
+        if(onProgress){
+            for(Block b : belowblockSet){
+                b.setType(Material.CONCRETE);
+                b.setData((byte) dura);
+            }
+        }
+
+    }
+
+    private void colorTeams_random(Team... t){
+        Random rn = new Random();
+        int i = rn.nextInt(t.length);
+        Team now = t[i];
+
+        for(Block b : belowblockSet){
+            short dura = now.getColor().getData();
+            b.setType(Material.CONCRETE);
+            b.setData((byte) dura);
+        }
+        for(Block b : blockSet){
+            short dura = now.getColor().getData();
+            b.setType(Material.STAINED_GLASS);
+            b.setData((byte) dura);
+        }
+    }
+
+    public void colorTeams(Team... t){
+
+        int temp = 0;
+        int size = t.length;
+
+        for(Block b : belowblockSet){
+            Team now = t[temp % size];
+            short dura = now.getColor().getData();
+            b.setType(Material.CONCRETE);
+            b.setData((byte) dura);
+            temp++;
+        }
+
+        temp = 0;
+
+        for(Block b : blockSet){
+            Team now = t[temp % size];
+            short dura = now.getColor().getData();
+            b.setType(Material.STAINED_GLASS);
+            b.setData((byte) dura);
+            temp++;
+        }
     }
 
     public void registerLocations(){
@@ -339,24 +397,6 @@ public class Tile {
         return center;
     }
 
-    public ArmorStand getDummy(){
-        return this.centerDummy;
-    }
-
-    public static void unregisterDummy(){
-        for(Tile tile : TILE_SET){
-            if(tile.getDummy() != null)
-                tile.killDummy();
-        }
-    }
-
-    public static void registerDummy(){
-        for(Tile tile : TILE_SET){
-            if(tile.getDummy() != null)
-                tile.spawnDummy();
-        }
-    }
-
     public static void registerTiles(){
         final int distance = RADIUS*2-1;
         int amount = RADIUS*2+1;
@@ -400,7 +440,6 @@ public class Tile {
                 map.put(x_index,new ArrayList<Tile>());
             }
             map.get(x_index).add(tile);
-            tile.spawnDummy();
             TILE_SET.add(tile);
         }
 
@@ -420,6 +459,7 @@ public class Tile {
 
         private int tick = 0;
 
+        private boolean flag_colored = false;
 
         public TileRunnable(){
 
@@ -437,8 +477,7 @@ public class Tile {
             if(PlayerList.isEmpty()) return;
 
             boolean same = false;
-            Team dom = null;
-            Team dom2 = null;
+            List<Team> dom = new ArrayList<Team>();
             int max = 0;
             for(Team t : PlayerList.keySet()) {
                 if(t == null) continue;
@@ -455,11 +494,12 @@ public class Tile {
 
                 List<Player> in = PlayerList.get(t);
                 if (max < in.size()) {
-                    dom = t;
+                    dom.clear();
+                    dom.add(t);
                     max = in.size();
                     same = false;
                 } else if (max > 0 && max == in.size()) {
-                    dom2 = t;
+                    dom.add(t);
                     same = true;
                 }
                 for (Player ap : in) {
@@ -467,14 +507,40 @@ public class Tile {
                 }
             }
 
-            if(own == null || (dom != null && own != dom)){
-                bar.setColor(same ? ((tick / 10) % 2 == 0 ? dom.getColor().getBarColor() : dom2.getColor().getBarColor())
-                        : (dom != null ? dom.getColor().getBarColor() : BarColor.PURPLE));
-                bar.setTitle(same ? dom.getColor().getChatColor() + ">> 대치" + dom2.getColor().getChatColor() + " 중 <<" : dom != null ? dom.getColor().getKoreanName() + "팀 §f점령 중..." : "§f빈 땅입니다.");
-            } else if(dom != null){
-                bar.setTitle(dom.getColor().getKoreanName() + "팀의 영토");
-                bar.setColor(dom.getColor().getBarColor());
+
+            if((dom.size() == 1 && dom.get(0) == own) || (dom.size() == 0 && own != null)){
+                bar.setTitle(own.getColor().getKoreanName() + "팀의 영토");
+                bar.setColor(own.getColor().getBarColor());
                 bar.setProgress(1.0F);
+                if(state_tick > 0) state_tick--;
+
+                if(state_tick == 0){
+                    colorAll(own);
+                } else {
+                    if(!flag_colored){
+                        colorAll(own, true);
+                        flag_colored = true;
+                    }
+                }
+
+
+            } else if(dom.size() > 0){
+
+
+
+                int temp = (tick / 10) % dom.size();
+                int temp2 = temp + 1;
+                if(temp2 >= dom.size())
+                    temp2 = 0;
+
+                bar.setColor(same ? dom.get(temp).getColor().getBarColor()
+                        : dom.get(0).getColor().getBarColor());
+                bar.setTitle(same ? dom.get(temp).getColor().getChatColor() + ">> 대치" + dom.get(temp2).getColor().getChatColor() + " 중 <<" : dom.size() > 0 ? dom.get(0).getColor().getKoreanName() + "팀 §f점령 중..." : "§f빈 땅입니다.");
+                if(same) {
+                    colorTeams(dom.toArray(new Team[0]));
+                    flag_colored = false;
+                }
+
             }
 
             float progress = (float) state_tick / (float) NEED_DOMINATE_TICK;
@@ -483,8 +549,8 @@ public class Tile {
             }
             bar.setProgress(progress);
 
-            if(dom != null && dom2 == null)
-                processOccupation(dom);
+            if(dom.size() == 1)
+                processOccupation(dom.get(0));
 
         }
 
