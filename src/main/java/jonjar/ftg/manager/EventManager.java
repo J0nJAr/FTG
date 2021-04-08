@@ -4,17 +4,14 @@ import jonjar.ftg.FTG;
 import jonjar.ftg.entity.PlayerInfo;
 import jonjar.ftg.entity.Tile;
 import jonjar.ftg.util.LocationUtil;
-import net.md_5.bungee.api.ChatMessageType;
-import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.Projectile;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.FoodLevelChangeEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
@@ -52,6 +49,29 @@ public class EventManager implements Listener {
             Player e = (Player) event.getEntity();
             if(PlayerInfo.getPlayerInfo(e).isDead())
                 event.setCancelled(true);
+        }
+    }
+
+    @EventHandler
+    public void onDamageByEntity(EntityDamageByEntityEvent event){
+        if(event.getEntity() instanceof Player){
+            Player e = (Player) event.getEntity();
+            Player p = null;
+            if(event.getDamager() instanceof Player)
+                p = (Player) event.getDamager();
+            else if(event.getDamager() instanceof Projectile && ((Projectile) event.getDamager()).getShooter() != null){
+                Projectile proj = (Projectile) event.getDamager();
+                if(proj.getShooter() != null && proj.getShooter() instanceof Player){
+                    p = (Player) proj.getShooter();
+                }
+            }
+            if(p != null){
+                PlayerInfo pi = PlayerInfo.getPlayerInfo(p);
+                PlayerInfo ei = PlayerInfo.getPlayerInfo(e);
+                if(pi.getTeam() == ei.getTeam())
+                    event.setCancelled(true);
+            }
+
         }
     }
 

@@ -53,8 +53,6 @@ public class Team {
         Objective obj = sc.registerNewObjective("tile", "dummy");
         obj.setDisplayName("§l점령한 타일");
 
-        for(Team t : TeamList)
-            t.unregister();
         TeamList.clear();
     }
 
@@ -109,11 +107,6 @@ public class Team {
             if(pi != null)
                 pi.leaveTeam();
         }
-
-
-
-        team.unregister();
-        team = null;
     }
 
     public org.bukkit.scoreboard.Team getTeam() {

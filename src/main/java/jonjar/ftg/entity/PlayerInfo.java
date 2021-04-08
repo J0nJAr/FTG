@@ -44,7 +44,7 @@ public class PlayerInfo {
     private final UUID uuid;
 
     private boolean observe = false;
-    private boolean isDead = false;
+    private boolean isDead;
     private Team team;
 
 
@@ -59,6 +59,7 @@ public class PlayerInfo {
     public PlayerInfo(String name, UUID uuid){
         this.name = name;
         this.uuid = uuid;
+        this.isDead = false;
         PlayerInfoList.put(name.toLowerCase(), this);
     }
 
@@ -98,6 +99,7 @@ public class PlayerInfo {
             public void run(){
 
                 if(GameManager.STATE != GameManager.GameState.START){
+                    isDead = false;
                     this.cancel();
                     return;
                 }

@@ -33,7 +33,7 @@ public class Tile {
 
 
     public static final Location LOCATION_0 =  new Location(FTG.world,153D,5D,-52D);
-    public static final int NEED_DOMINATE_TICK = 20;
+    public static final int NEED_DOMINATE_TICK = 50;
 
     private ArrayList<Set<Tile>> nearTileList; //거리별 타일
     private HashMap<Tile,Integer> tileDistanceList;//타일별 거리

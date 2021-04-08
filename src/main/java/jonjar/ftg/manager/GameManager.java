@@ -33,7 +33,7 @@ public class GameManager extends MsgSender {
 
     public static GameState STATE = GameState.WAIT;
 
-    public final static int GAME_DURATION_SEC = 5;
+    public final static int GAME_DURATION_SEC = 310;
 
     private int elapsed_tick;
     public static boolean PAUSE = false;
@@ -185,7 +185,7 @@ public class GameManager extends MsgSender {
                             max = obj.getScore(t.getColor().getChatColor() + t.getTeam().getName()).getScore();
                         } else {
                             int i = obj.getScore(t.getTeam().getColor() + t.getTeam().getName()).getScore();
-                            if(max > i){
+                            if(max < i){
                                 winner = t;
                                 max = i;
                             } else if(max == i){
