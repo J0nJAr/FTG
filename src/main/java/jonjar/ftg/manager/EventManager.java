@@ -101,7 +101,8 @@ public class EventManager implements Listener {
             PlayerInfo pi = PlayerInfo.getPlayerInfo(p);
             pi.addKill();
         }
-        e.setHealth(20D);
+
+        e.spigot().respawn();
         event.setKeepInventory(true);
     }
 

@@ -60,14 +60,21 @@ public class Team {
     private final TeamColor tc;
     private final ItemStack[] armors;
 
+
     private org.bukkit.scoreboard.Team team;
 
     private final List<Tile> tiles;
+
+
+    public boolean cantRespawn;
+    public boolean isFever;
 
     public Team(TeamColor tc){
         this.tc = tc;
         this.tiles = new ArrayList<>();
 
+        isFever = false;
+        cantRespawn =false;
         armors = new ItemStack[4];
         armors[3] = color(Material.LEATHER_HELMET);
         armors[2] = color(Material.LEATHER_CHESTPLATE);

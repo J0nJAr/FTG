@@ -138,8 +138,10 @@ public class Tile {
         if(this.blockSet == null){//아직 블럭 set가 없으면 생성
             blockSet = new HashSet<>();
             belowblockSet = new HashSet<>();
-            this.getLocations().forEach(l -> blockSet.add(l.getBlock()));
-            this.getLocations().forEach(l -> belowblockSet.add(l.getBlock().getRelative(BlockFace.DOWN)));
+            for (Location location : this.getLocations()) {
+                blockSet.add(location.getBlock());
+                belowblockSet.add(location.getBlock().getRelative(BlockFace.DOWN));
+            }
         }
         return blockSet;
     }

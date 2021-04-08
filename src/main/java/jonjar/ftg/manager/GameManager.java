@@ -5,7 +5,6 @@ import jonjar.ftg.entity.PlayerInfo;
 import jonjar.ftg.entity.Team;
 import jonjar.ftg.entity.Tile;
 import jonjar.ftg.util.ContainerUtil;
-import jonjar.ftg.util.LocationUtil;
 import jonjar.ftg.util.MsgSender;
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.TextComponent;
@@ -16,6 +15,9 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scoreboard.DisplaySlot;
 import org.bukkit.scoreboard.Objective;
 import org.bukkit.scoreboard.Scoreboard;
+
+import java.util.ArrayList;
+import java.util.HashSet;
 
 public class GameManager extends MsgSender {
 
@@ -38,9 +40,9 @@ public class GameManager extends MsgSender {
     private int elapsed_tick;
     public static boolean PAUSE = false;
 
-    private GameManagerTask runnable;
+    public static GameManagerTask runnable;
     private MainGameTask main_task;
-
+    public static boolean isFever;
 
     /*
     1. 관리자가 team 명령어를 통해 팀 배분 시켰는지 확인
@@ -57,6 +59,7 @@ public class GameManager extends MsgSender {
                 runnable.runTaskTimer(plugin, 0L, 1L);
                 broadcast("§f§l" + p.getName() + "님께서 게임을 시작하셨습니다!");
                 STATE = GameState.READY;
+                isFever = false;
             } else {
                 error(p, "§c팀 배분을 받지 못한 플레이어가 있습니다.");
             }
@@ -166,45 +169,74 @@ public class GameManager extends MsgSender {
     }
 
     public class GameManagerTask extends BukkitRunnable {
-
+        public int remain_sec = 0;
         public void run(){
             
             if(PAUSE)
                 return;
 
             if(elapsed_tick % 20 == 0){
-                int remain_sec = (GAME_DURATION_SEC * 20 - elapsed_tick + 200) / 20;
+                remain_sec = (GAME_DURATION_SEC * 20 - elapsed_tick + 200) / 20;
                 if(remain_sec == 0){
-                    broadcast("============================");
+
+                    HashSet<Team> winners = new HashSet<>();
+
                     Team winner = null;
                     int max = 0;
                     Objective obj = Bukkit.getScoreboardManager().getMainScoreboard().getObjective("tile");
                     for(Team t : Team.getTeams()){
+                        t.cantRespawn = true;
                         if(winner == null){
                             winner = t;
                             max = obj.getScore(t.getColor().getChatColor() + t.getTeam().getName()).getScore();
                         } else {
                             int i = obj.getScore(t.getTeam().getColor() + t.getTeam().getName()).getScore();
                             if(max < i){
+                                winners.clear();
+                                winners.add(t);
                                 winner = t;
                                 max = i;
                             } else if(max == i){
+                                winners.add(t);
                                 winner = null;
-                                break;
                             }
                             // TODO : 동점 시 그... 뭐드라? 리스폰 금지압수
                         }
                     }
-                    if(winner == null){
-                        broadcast("우승 팀 : 무승부!");
-                    } else {
-                        broadcast("우승 팀 : " + winner.getColor().getKoreanName());
-                    }
+                    if(winner == null){//무승부
+                        StringBuilder sb = new StringBuilder();
+                        sb.append("동률인 팀 : ");
+                        for (Team t : winners) {
+                            sb.append(t.getColor().getKoreanName() + ", ");
+                            t.isFever = true;
+                        }
 
-                    broadcast("============================");
-                    end();
+                        sb.delete(sb.length()-2,sb.length()-1);
+
+                        isFever = true;
+                        broadcast("============================");
+                        broadcast("현재 동률인 팀이 있으므로 리스폰이 금지되며, 최후의 팀이 나올 때 까지 게임이 진행됩니다.");
+                        broadcast(sb.toString());
+                        broadcast("============================");
+                    } else {
+                        broadcast("============================");
+                        broadcast("우승 팀 : " + winner.getColor().getKoreanName());
+                        broadcast("============================");
+                        end();
+                    }
                     return;
-                } else if(remain_sec <= 10 && remain_sec > 0){
+
+                }else if (isFever){
+                    int feverTime  = -remain_sec;
+                    if(feverTime % 60 == 0){
+                        broadcast("§c연장 시간 " + remain_sec/60 + "분 경과.");
+                    } else if (feverTime == 30){
+                        broadcast("§c연장 시간 " + remain_sec + "초 경과.");
+                    }else if (feverTime % 30 ==0){
+                        broadcast("§c연장 시간 "+ remain_sec/60+ "분 " + remain_sec + "초 경과.");
+                    }
+                }
+                else if(remain_sec <= 10 && remain_sec > 0){
                     broadcast("§c§l게임 종료까지 " + remain_sec + "초 남았습니다.");
                 } else if(remain_sec == 30){
                     broadcast("§c게임 종료까지 " + remain_sec + "초 남았습니다.");

@@ -38,6 +38,7 @@ public class ContainerUtil {
                 tc.setInventory(chest.getInventory());
                 }
             }
+
         _chest.add(0,0,2);
         _color.add(0,0,2);
         }

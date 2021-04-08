@@ -84,7 +84,8 @@ public class CommandManager extends MsgSender implements CommandExecutor {
         main.getGameManager().pause(p);
     }
 
-    public final static List<String> CMD_TEAM = Arrays.asList("random", "setting", "join", "list", "leave", "reset");
+    public final static List<String>
+            CMD_TEAM = Arrays.asList("random", "setting", "join", "list", "leave", "reset");
 
     private void team(Player p, String[] args) {
 

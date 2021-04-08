@@ -14,6 +14,8 @@ import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.lang.reflect.Array;
@@ -46,7 +48,7 @@ public class PlayerInfo {
     private boolean observe = false;
     private boolean isDead;
     private Team team;
-
+    private GameManager gm;
 
     // Player Stats
     private int kill = 0; // 킬
@@ -94,6 +96,7 @@ public class PlayerInfo {
         nowLocation = null;
         isDead = true;
 
+
         new BukkitRunnable() {
             private int tick = RESPWAN_TICK;
             public void run(){
@@ -107,6 +110,14 @@ public class PlayerInfo {
                 if(!p.isOnline())
                     return;
 
+                if(GameManager.isFever) { //연장시간이면
+                    Team t = PlayerInfo.getPlayerInfo(p).getTeam();
+                    if (t.cantRespawn) { //리스폰 불가인지 확인하고, 불가이면 return해서 끊기.
+                        if (t.isFever && tick % 20 == 0)//1초마다 메세지 출력
+                            p.sendTitle("", "§f연장시간 §c" + -GameManager.runnable.remain_sec + "초§f 경과", 0, 24, 0);
+                        return;  //리스폰 불가일때 반환
+                   }
+                }
                 tick--;
 
                 if(tick % 20 == 0){
@@ -114,6 +125,8 @@ public class PlayerInfo {
                 }
 
                 if(tick == 0){
+                    p.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE,3,5,false,false));
+
                     this.cancel();
                     equipKits(true);
                     teleportBase();
