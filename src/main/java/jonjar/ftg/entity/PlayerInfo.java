@@ -112,14 +112,19 @@ public class PlayerInfo {
 
                 tick--;
 
+                Team t = PlayerInfo.getPlayerInfo(p).getTeam();
+
                 if(GameManager.isFever) { //연장시간이면
-                    Team t = PlayerInfo.getPlayerInfo(p).getTeam();
-                    if (t.cantRespawn) { //리스폰 불가인지 확인하고, 불가이면 return해서 끊기.
-                        if (t.isFever && tick % 20 == 0)//1초마다 메세지 출력
-                            p.sendTitle("", "§f연장시간 §c" + -GameManager.runnable.remain_sec + "초§f 경과", 0, 24, 0);
-                        return;  //리스폰 불가일때 반환
-                   }
+                    if (t.isSurvived && tick % 20 == 0)//1초마다 메세지 출력, 팀 생존상태
+                        p.sendTitle("", "§f연장시간 §c" + -GameManager.runnable.remain_sec + "초§f 경과", 0, 24, 0);
+                    else if (!t.isSurvived && tick % 20 == 0)//1초마다 메세지 출력, 팀 비생존 상태(관전 only)
+                        p.sendTitle("", "§f연장시간 §c" + -GameManager.runnable.remain_sec + "초§f 경과", 0, 24, 0);
                 }
+
+
+                if (t.cantRespawn) { //리스폰 불가인지 확인하고, 불가이면 return해서 끊기.
+                    return;  //리스폰 불가일때 끊기
+                 }
 
 
                 if(tick % 20 == 0){

@@ -67,13 +67,13 @@ public class Team {
 
 
     public boolean cantRespawn;
-    public boolean isFever;
+    public boolean isSurvived;
 
     public Team(TeamColor tc){
         this.tc = tc;
         this.tiles = new ArrayList<>();
 
-        isFever = false;
+        isSurvived = true;
         cantRespawn =false;
         armors = new ItemStack[4];
         armors[3] = color(Material.LEATHER_HELMET);

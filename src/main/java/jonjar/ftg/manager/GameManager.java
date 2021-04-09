@@ -186,6 +186,8 @@ public class GameManager extends MsgSender {
                     Objective obj = Bukkit.getScoreboardManager().getMainScoreboard().getObjective("tile");
                     for(Team t : Team.getTeams()){
                         t.cantRespawn = true;
+                        t.isSurvived = false; //일단 모든 팀 생존 플래그 끄기.
+
                         if(winner == null){
                             winner = t;
                             max = obj.getScore(t.getColor().getChatColor() + t.getTeam().getName()).getScore();
@@ -208,7 +210,7 @@ public class GameManager extends MsgSender {
                         sb.append("동률인 팀 : ");
                         for (Team t : winners) {
                             sb.append(t.getColor().getKoreanName() + ", ");
-                            t.isFever = true;
+                            t.isSurvived = true; //동률인 팀들만 생존 플래그 켜기.
                         }
 
                         sb.delete(sb.length()-2,sb.length()-1);
