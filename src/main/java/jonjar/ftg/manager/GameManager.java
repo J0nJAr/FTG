@@ -58,6 +58,7 @@ public class GameManager extends MsgSender {
         } else {
 
             if(checkTeam()){
+                if(DropsManager.Sum_modifier==0) error(p,"§c보급이 존재하지 않습니다. 확률을 확인해주세요.");
                 runnable = new GameManagerTask();
                 runnable.runTaskTimer(plugin, 0L, 1L);
                 broadcast("§f§l" + p.getName() + "님께서 게임을 시작하셨습니다!");

@@ -60,6 +60,8 @@ public class CommandManager extends MsgSender implements CommandExecutor {
             stop(p);
         else if(args[0].equalsIgnoreCase("pause"))
             pause(p);
+        else if(args[0].equalsIgnoreCase("drops"))
+            drops(p);
         else if(args[0].equalsIgnoreCase("team"))
             team(p, args);
         else if(args[0].equalsIgnoreCase("observer"))
@@ -71,7 +73,11 @@ public class CommandManager extends MsgSender implements CommandExecutor {
         
         return true;
     }
-    
+
+    private void drops(Player p) {
+        DropsManager.openGUI(p);
+    }
+
     private void start(Player p){
         main.getGameManager().start(p);
     }
