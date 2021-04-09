@@ -68,6 +68,7 @@ public class Team {
 
     public boolean cantRespawn;
     public boolean isSurvived;
+    public int survivedPlayerNum;
 
     public Team(TeamColor tc){
         this.tc = tc;
@@ -198,6 +199,9 @@ public class Team {
 
         public String getKoreanName() {
             return cc + korean;
+        }
+        public String getKoreanName(String head) {
+            return head + korean;
         }
 
         public Tile getBaseTile(){

@@ -122,7 +122,7 @@ public class CommandManager extends MsgSender implements CommandExecutor {
         }
     }
 
-    public final static List<String> CMD_DEBUG = Arrays.asList("setTile","register","testDistance","getTile","getChest", "fastStart");
+    public final static List<String> CMD_DEBUG = Arrays.asList("setTile","register","testDistance","getTile","getChest", "fastStart","armor");
 
     private void debug(Player p, String[] args) {
         if(args.length==1){
@@ -133,7 +133,7 @@ public class CommandManager extends MsgSender implements CommandExecutor {
             msg_cmt(p, getCmt_Click(ChatColor.GRAY +"register", new String[]{"debug", "register"}));
             msg_cmt(p, getCmt_Click(ChatColor.GRAY +"testDistance", new String[]{"debug", "testDistance","1"}));
             msg_cmt(p, getCmt_Click(ChatColor.GRAY +"getTile", new String[]{"debug", "getTile"}));
-            msg_cmt(p, getCmt_Click(ChatColor.GRAY +"getChest", new String[]{"debug", "getChest"}));
+            msg_cmt(p, getCmt_Click(ChatColor.GRAY +"방어구 재지급", new String[]{"debug", "armor"}));
             msg_cmt(p, getCmt_Click(ChatColor.GRAY + "fastStart 2", new String[]{"debug", "fastStart", "2"}));
             msg_cmt(p, getCmt_Click(ChatColor.GRAY + "fastStart 3", new String[]{"debug", "fastStart", "3"}));
             msg_cmt(p, getCmt_Click("RELOAD", ChatColor.DARK_RED+""+ChatColor.BOLD+"FORCE RELOAD" ,new String[]{"confirm"}));
@@ -179,10 +179,6 @@ public class CommandManager extends MsgSender implements CommandExecutor {
                     break;
                 case "getTile" :
                     msg(p,LocationUtil.getClosestTile(p.getLocation()).toString());
-                    break;
-                case "getChest" :
-                    ContainerUtil.getInstance().setInventory(p,(Chest) new Location(FTG.world,-15,5,2).getBlock().getState());
-                    msg(p,"com");
                     break;
             }
         }

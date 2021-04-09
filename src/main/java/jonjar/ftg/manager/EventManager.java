@@ -2,8 +2,11 @@ package jonjar.ftg.manager;
 
 import jonjar.ftg.FTG;
 import jonjar.ftg.entity.PlayerInfo;
+import jonjar.ftg.entity.Team;
 import jonjar.ftg.entity.Tile;
 import jonjar.ftg.util.LocationUtil;
+import jonjar.ftg.util.MsgSender;
+import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
@@ -15,6 +18,7 @@ import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.FoodLevelChangeEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
+import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.player.*;
 
 public class EventManager implements Listener {
@@ -95,6 +99,19 @@ public class EventManager implements Listener {
         Player e = event.getEntity();
         Player p = e.getKiller();
         PlayerInfo ei = PlayerInfo.getPlayerInfo(e);
+
+
+        Team t = ei.getTeam();
+
+        if(GameManager.isFever&&t.isSurvived&&!ei.isDead){
+            t.survivedPlayerNum--;
+            if(t.survivedPlayerNum==0){
+                t.isSurvived = false;
+                MsgSender.getMsgSender().broadcast(t.getColor().getKoreanName(t.getColor().getChatColor().toString()+ChatColor.BOLD)+"팀"+ ChatColor.RED +ChatColor.BOLD+"이 탈락했습니다.");
+                //TODO:팀 탈락 메세지 & 이벤트
+            }
+        }
+
         ei.onDeath();
 
         if(p != null){
@@ -135,4 +152,8 @@ public class EventManager implements Listener {
         }
     }
 
+    @EventHandler
+    public void InventoryClickEvent(InventoryClickEvent event){
+        DropsManager.InventoryClickEvent(event);
+    }
 }

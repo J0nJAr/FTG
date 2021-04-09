@@ -9,8 +9,11 @@ import jonjar.ftg.util.MsgSender;
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
 import org.bukkit.entity.Player;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scoreboard.DisplaySlot;
 import org.bukkit.scoreboard.Objective;
@@ -35,7 +38,7 @@ public class GameManager extends MsgSender {
 
     public static GameState STATE = GameState.WAIT;
 
-    public final static int GAME_DURATION_SEC = 310;
+    public final static int GAME_DURATION_SEC = 5;
 
     private int elapsed_tick;
     public static boolean PAUSE = false;
@@ -112,7 +115,7 @@ public class GameManager extends MsgSender {
     private void reset(){
         this.elapsed_tick = 0;
 
-        for(Player ap : Bukkit.getOnlinePlayers()){
+        for(Player ap : Bukkit.getOnlinePlayers()){ //FIXME:이거 잠깐 나가있으면 리셋 안되지 않니?
             ap.getInventory().clear();
             ap.teleport(FTG.world.getSpawnLocation());
             ap.setGameMode(GameMode.ADVENTURE);
@@ -172,6 +175,8 @@ public class GameManager extends MsgSender {
         }
     }
 
+
+
     public class GameManagerTask extends BukkitRunnable {
         public int remain_sec = 0;
         public void run(){
@@ -185,36 +190,60 @@ public class GameManager extends MsgSender {
 
                     HashSet<Team> winners = new HashSet<>();
 
-                    Team winner = null;
                     int max = 0;
                     Objective obj = Bukkit.getScoreboardManager().getMainScoreboard().getObjective("tile");
                     for(Team t : Team.getTeams()){
                         t.cantRespawn = true;
                         t.isSurvived = false; //일단 모든 팀 생존 플래그 끄기.
+                        t.survivedPlayerNum = 0;
 
-                        if(winner == null){
-                            winner = t;
+                        if(winners.isEmpty()){
+                            winners.add(t);
                             max = obj.getScore(t.getColor().getChatColor() + t.getTeam().getName()).getScore();
                         } else {
                             int i = obj.getScore(t.getTeam().getColor() + t.getTeam().getName()).getScore();
                             if(max < i){
                                 winners.clear();
                                 winners.add(t);
-                                winner = t;
                                 max = i;
                             } else if(max == i){
                                 winners.add(t);
-                                winner = null;
                             }
                             // TODO : 동점 시 그... 뭐드라? 리스폰 금지압수
                         }
                     }
-                    if(winner == null){//무승부
-                        StringBuilder sb = new StringBuilder();
-                        sb.append("동률인 팀 : ");
-                        for (Team t : winners) {
-                            sb.append(t.getColor().getKoreanName() + ", ");
-                            t.isSurvived = true; //동률인 팀들만 생존 플래그 켜기.
+                    if(winners.size()!=1){//무승부
+                        StringBuilder sb = new StringBuilder().append("동률인 팀 : ");
+                        for (Team t : Team.getTeams()) { //각 팀에서
+                            if (winners.contains(t)) { //동률 팀인경우
+                                sb.append(t.getColor().getKoreanName()).append(ChatColor.WHITE).append(", ");
+
+                                for(String UUID : t.getTeam().getEntries()){ //플레이어들을 뽑는다
+                                    PlayerInfo pi = PlayerInfo.getPlayerInfoByUUID(UUID);
+
+                                    t.isSurvived = true; //동률인 팀들만 생존 플래그 켜기.
+
+                                    Player p = Bukkit.getPlayer(pi.getName());
+
+                                    p.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 3, 5, false, false));
+                                    if (pi.isDead) {//CHECK: 죽어있는 플레이어들 일괄부활
+                                        pi.respawnTimer.cancel();
+                                        pi.equipKits(true);
+                                        pi.isDead = false;
+                                    } else {
+                                        p.setHealth(20);
+                                    }
+                                    pi.teleportBase();
+                                    pi.getTeam().survivedPlayerNum++;
+                                }
+                            } else {//동률이 아닌 플레이어들 사망처리.
+                                for(String UUID : t.getTeam().getEntries()){ //플레이어들을 뽑는다
+                                    PlayerInfo pi = PlayerInfo.getPlayerInfoByUUID(UUID);
+                                    pi.onDeath();
+                                }
+
+                            }
+
                         }
 
                         sb.delete(sb.length()-2,sb.length()-1);
@@ -226,20 +255,21 @@ public class GameManager extends MsgSender {
                         broadcast("============================");
                     } else {
                         broadcast("============================");
-                        broadcast("우승 팀 : " + winner.getColor().getKoreanName());
+                        broadcast("우승 팀 : " + winners.iterator().next().getColor().getKoreanName());
                         broadcast("============================");
                         end();
+                        return;
                     }
-                    return;
+
 
                 }else if (isFever){
                     int feverTime  = -remain_sec;
                     if(feverTime % 60 == 0){
-                        broadcast("§c연장 시간 " + remain_sec/60 + "분 경과.");
+                        broadcast("§c연장 시간 " + feverTime/60 + "분 경과.");
                     } else if (feverTime == 30){
-                        broadcast("§c연장 시간 " + remain_sec + "초 경과.");
+                        broadcast("§c연장 시간 " + feverTime + "초 경과.");
                     }else if (feverTime % 30 ==0){
-                        broadcast("§c연장 시간 "+ remain_sec/60+ "분 " + remain_sec + "초 경과.");
+                        broadcast("§c연장 시간 "+ feverTime/60+ "분 " + feverTime%60 + "초 경과.");
                     }
                 }
                 else if(remain_sec <= 10 && remain_sec > 0){
@@ -264,7 +294,7 @@ public class GameManager extends MsgSender {
                         t.resetInfo();
                     }
                     Tile.registerMasterTiles();
-                    ContainerUtil.getInstance().registerAllInventory();
+                    ContainerUtil.registerAllInventory();
                     break;
                 case 120:
                     broadcast("§f초기화 완료. 3초 뒤 게임을 시작합니다.");

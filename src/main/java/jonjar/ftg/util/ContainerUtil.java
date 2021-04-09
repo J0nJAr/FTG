@@ -15,19 +15,10 @@ import java.util.Map;
 
 public class ContainerUtil {
 
-    Location LOCATION_CONTAINER;
-    static ContainerUtil c;
+    private final static Location LOCATION_CONTAINER = new Location(FTG.world,-15,5,2);
 
-    private ContainerUtil(){
-        LOCATION_CONTAINER = new Location(FTG.world,-15,5,2);
-    }
 
-    public static ContainerUtil getInstance(){
-        if (c==null) c= new ContainerUtil();
-        return c;
-    }
-
-    public void registerAllInventory(){
+    public static void registerAllInventory(){
         Location _color =LOCATION_CONTAINER.clone();
         Location _chest = LOCATION_CONTAINER.clone();
         _color.add(0,-1,0);
@@ -44,12 +35,13 @@ public class ContainerUtil {
         }
     }
 
-    public void setInventory(Player p, Chest c){
+
+    public static void setInventory(Player p, Chest c){
         // if(!(b instanceof Chest)) return;
         setInventory(p,c.getInventory());
     }
 
-    public void setInventory(Player p, Inventory inv){
+    public static void setInventory(Player p, Inventory inv){
        // if(!(b instanceof Chest)) return;
         PlayerInventory pi = p.getInventory();
         for(int i =0; i<=40 ; i++) {

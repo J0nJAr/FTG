@@ -13,6 +13,12 @@ import org.bukkit.command.PluginCommand;
 import java.util.Arrays;
 
 public class MsgSender {
+    private static MsgSender msgSender;
+
+    public static MsgSender getMsgSender() {
+        if(msgSender==null) msgSender = new MsgSender();
+        return msgSender;
+    }
 
     public void msg(CommandSender sender, String msg){
         sender.sendMessage("§e[FTG] §f" + msg);
