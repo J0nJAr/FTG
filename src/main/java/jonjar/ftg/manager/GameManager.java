@@ -60,6 +60,10 @@ public class GameManager extends MsgSender {
                 broadcast("§f§l" + p.getName() + "님께서 게임을 시작하셨습니다!");
                 STATE = GameState.READY;
                 isFever = false;
+                for (Team t : Team.getTeams()) {
+                    t.isSurvived = true;
+                    t.cantRespawn = false;
+                }
             } else {
                 error(p, "§c팀 배분을 받지 못한 플레이어가 있습니다.");
             }

@@ -114,34 +114,33 @@ public class PlayerInfo {
 
                 Team t = PlayerInfo.getPlayerInfo(p).getTeam();
 
-                if(GameManager.isFever) { //연장시간이면
-                    if (t.isSurvived && tick % 20 == 0)//1초마다 메세지 출력, 팀 생존상태
+                if(tick % 20 == 0){//1초마다 메세지 출력,
+                    if(GameManager.isFever) { //연장시간이면
+                        if (t.isSurvived){// 팀 생존상태
                         p.sendTitle("", "§f연장시간 §c" + -GameManager.runnable.remain_sec + "초§f 경과", 0, 24, 0);
-                    else if (!t.isSurvived && tick % 20 == 0)//1초마다 메세지 출력, 팀 비생존 상태(관전 only)
+                        }else if (!t.isSurvived){//팀 비생존 상태(관전 only)
                         p.sendTitle("", "§f연장시간 §c" + -GameManager.runnable.remain_sec + "초§f 경과", 0, 24, 0);
-                }
+                        }
+                    } else{ //연장시간이 아님.
+                        p.sendTitle("", "§e" + tick/20 + "§f초 뒤 리스폰됩니다.", 0, 24, 0);
+                    }
 
+                    if (t.cantRespawn) { //리스폰 불가인지 확인하고, 불가이면 return해서 끊기.
+                        return;  //리스폰 불가일때 끊기
+                    }
+                    if(tick == 0){
+                        p.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE,3,5,false,false));
 
-                if (t.cantRespawn) { //리스폰 불가인지 확인하고, 불가이면 return해서 끊기.
-                    return;  //리스폰 불가일때 끊기
-                 }
-
-
-                if(tick % 20 == 0){
-                    p.sendTitle("", "§e" + tick/20 + "§f초 뒤 리스폰됩니다.", 0, 24, 0);
-                }
-
-                if(tick == 0){
-                    p.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE,3,5,false,false));
-
-                    this.cancel();
-                    equipKits(true);
-                    teleportBase();
-                    isDead = false;
+                        this.cancel();
+                        equipKits(true);
+                        teleportBase();
+                        isDead = false;
+                    }
                 }
             }
         }.runTaskTimer(FTG.INSTANCE, 0L, 1L);
     }
+
 
     public void updateNowTile(Player p, Tile t){
 
