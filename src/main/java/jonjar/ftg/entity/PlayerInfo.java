@@ -110,6 +110,8 @@ public class PlayerInfo {
                 if(!p.isOnline())
                     return;
 
+                tick--;
+
                 if(GameManager.isFever) { //연장시간이면
                     Team t = PlayerInfo.getPlayerInfo(p).getTeam();
                     if (t.cantRespawn) { //리스폰 불가인지 확인하고, 불가이면 return해서 끊기.
@@ -118,7 +120,7 @@ public class PlayerInfo {
                         return;  //리스폰 불가일때 반환
                    }
                 }
-                tick--;
+
 
                 if(tick % 20 == 0){
                     p.sendTitle("", "§e" + tick/20 + "§f초 뒤 리스폰됩니다.", 0, 24, 0);
