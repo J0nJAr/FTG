@@ -19,6 +19,17 @@ public class DropsManager {
     public final static String NAME = "Drops";
     public static LinkedHashMap<Integer,Drop> dropsMap = new LinkedHashMap<>();
 
+    private final static Inventory CONFIRM_GUI;
+    static {
+        CONFIRM_GUI = Bukkit.createInventory(null,9,"정말로 삭제모드로 바꾸겠습니까?");
+        ItemStack is = new ItemStack(Material.TNT);
+        ItemMeta im = is.getItemMeta();
+        im.setDisplayName(ChatColor.RED+""+ChatColor.BOLD+"예");
+        is.setItemMeta(im);
+        CONFIRM_GUI.setItem(4,is);
+    }
+    private static boolean delete = false;
+
     public static int Sum_modifier = 0;
 
 
@@ -40,6 +51,7 @@ public class DropsManager {
             ItemStack is = new ItemStack(Material.MAGENTA_GLAZED_TERRACOTTA);
             ItemStack make = new ItemStack(Material.CHEST);
             ItemStack pick = new ItemStack(Material.EMERALD);
+            ItemStack delete = new ItemStack(Material.TNT);
 
             ItemStack is2 = is.clone();
 
@@ -54,11 +66,15 @@ public class DropsManager {
             im.setDisplayName("뽑기");
             pick.setItemMeta(im);
 
+            im.setDisplayName(ChatColor.RED+""+ChatColor.BOLD+"삭제하기");
+            delete.setItemMeta(im);
+
             ItemMeta make_is = is.getItemMeta();
             make_is.setDisplayName(ChatColor.WHITE+"새 보급 만들기");
             make.setItemMeta(make_is);
 
             inv.setItem(45,is);
+            inv.setItem(48,delete);
             inv.setItem(49,make);
             inv.setItem(50,pick);
             inv.setItem(53,is2);
@@ -71,7 +87,9 @@ public class DropsManager {
         int idx=0;
         int pg=0;
         while(iterator.hasNext()){
-            getGUI(pg).setItem(idx,dropsMap.get(iterator.next()).getIcon());
+            ItemStack is = dropsMap.get(iterator.next()).getIcon();
+            if(delete) is.setType(Material.RED_SHULKER_BOX);
+            getGUI(pg).setItem(idx,is);
             if(45<=++idx){
                 idx=0;
                 pg++;
@@ -89,19 +107,31 @@ public class DropsManager {
                 if (itemStack == null) {
                     return;
                 }
-                if (itemStack.getType() == Material.WHITE_SHULKER_BOX) {
+                int num = 1;
+                if(event.isShiftClick()) num = 10;
+
+                if (itemStack.getType() == Material.ORANGE_SHULKER_BOX || itemStack.getType() == Material.WHITE_SHULKER_BOX) {
                     Drop drop = dropsMap.get(Integer.parseInt(event.getCurrentItem().getItemMeta().getDisplayName().split("번")[0]));
                     drop.inventory.setItem(27, drop.getIcon());
                     event.getWhoClicked().openInventory(drop.inventory);
-                } else if (event.getRawSlot() == 44) {
-                    event.getWhoClicked().openInventory(getGUI(Math.max(0,Integer.parseInt(name[2]) - 1)));
+                } if (itemStack.getType() == Material.RED_SHULKER_BOX) {
+                    Drop drop = dropsMap.get(Integer.parseInt(event.getCurrentItem().getItemMeta().getDisplayName().split("번")[0]));
+                    drop.remove();
+                    event.getInventory().setItem(event.getRawSlot(),null);
+                } else if (event.getRawSlot() == 45) {
+                    event.getWhoClicked().openInventory(getGUI(Math.max(0,Integer.parseInt(name[2]) - num)));
+                } else if (event.getRawSlot() == 48) {
+                    if(delete) {
+                        delete =false;
+                        updateGUIs();
+                    }
+                    else event.getWhoClicked().openInventory(CONFIRM_GUI);
                 } else if (event.getRawSlot() == 49) {
                     event.getWhoClicked().openInventory(new Drop().inventory);
                 } else if (event.getRawSlot() == 50) {
                     event.getWhoClicked().openInventory(getRandomDrop().inventory);
-
                 } else if (event.getRawSlot() == 53) {
-                    event.getWhoClicked().openInventory(getGUI(Integer.parseInt(name[2]) + 1));
+                    event.getWhoClicked().openInventory(getGUI(Math.min(100,Integer.parseInt(name[2]) + num)));
                 }
 
             } else {
@@ -120,7 +150,15 @@ public class DropsManager {
                     event.setCancelled(true);
                 }
             }
+        } else if (name[0].equals("정말로")) {
+            event.setCancelled(true);
+            if(event.getRawSlot()==4) {
+                delete = true;
+                updateGUIs();
+                event.getWhoClicked().openInventory(getGUI(0));
+            }
         }
+
     }
 
 
@@ -146,6 +184,7 @@ public class DropsManager {
 
     public static class Drop{
         private static int count = 0;//gui 이름 구분을 위한 숫자
+        private static SortedSet<Integer> blank = new TreeSet<>();
         private final int id; //고유 id
 
         private int modifier; //확률 관련 정수(경우의 수 느낌)
@@ -159,12 +198,14 @@ public class DropsManager {
             this.modifier = modifier;
             Sum_modifier+=this.modifier;
             this.inventory = Bukkit.createInventory(null,36,NAME+" "+count);
-
-            id = count;
+            if(blank.isEmpty()) {
+                id = count;
+                count++;
+            }else {
+                id = blank.first();
+                blank.remove(id);
+            }
             dropsMap.put(id,this);
-            count++;
-
-
             this.inventory.setItem(27,getIcon());
 
             ItemStack is = new ItemStack(Material.BARRIER);
@@ -179,6 +220,7 @@ public class DropsManager {
         }
 
         public void remove(){
+            blank.add(id);
             dropsMap.remove(id);
             Sum_modifier -= this.modifier;
         }
@@ -190,7 +232,14 @@ public class DropsManager {
         }
 
         public ItemStack getIcon(){
-            ItemStack icon = new ItemStack(Material.WHITE_SHULKER_BOX,1);
+            Material box;
+            if(modifier==0){
+                box = Material.WHITE_SHULKER_BOX;
+            }else {
+                box = Material.ORANGE_SHULKER_BOX;
+            }
+
+            ItemStack icon = new ItemStack(box,1);
 
             ItemMeta meta = icon.getItemMeta();
             BlockStateMeta bsm = (BlockStateMeta) meta;
