@@ -34,7 +34,7 @@ public class CommandManager extends MsgSender implements CommandExecutor {
         tm = new TeamManager();
         main = plugin;
     }
-    public static final List<String> CMD_MAIN = Arrays.asList("start","stop","pause","team","observer","debug");
+    public static final List<String> CMD_MAIN = Arrays.asList("start","stop","pause","team","observer","debug","drops");
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
 
