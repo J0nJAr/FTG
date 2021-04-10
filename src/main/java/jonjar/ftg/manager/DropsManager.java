@@ -83,6 +83,15 @@ public class DropsManager {
     }
 
     private static void updateGUIs(){
+
+        for(int i=0;i<Drop.count;i++){
+            Drop drop = dropsMap.get(i);
+            ItemStack is = drop.getIcon();
+            if(delete) is.setType(Material.RED_SHULKER_BOX);
+            getGUI(i / 45).setItem(i % 45,is);
+        }
+
+        /*
         Iterator iterator = dropsMap.keySet().iterator();
         int idx=0;
         int pg=0;
@@ -95,6 +104,7 @@ public class DropsManager {
                 pg++;
             }
         }
+         */
 
     }
 
