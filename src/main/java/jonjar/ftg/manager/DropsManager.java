@@ -240,7 +240,8 @@ public class DropsManager {
             inv = ContainerUtil.getFromChest(loc1);
             for (int i = 0; i < 45; i++) {
                 Drop drop = dropsMap.get(45*page+i);
-                inv.setItem(i,drop.getIcon(true));
+                if(drop == null) inv.setItem(i,null);
+                else inv.setItem(i,drop.getIcon(true));
             }
             loc1.subtract(0,1,0);
         }
@@ -248,7 +249,8 @@ public class DropsManager {
             inv = ContainerUtil.getFromChest(loc2);
             for (int i = 0; i < 45; i++) {
                 Drop drop = dropsMap.get(45*page+i);
-                inv.setItem(i,drop.getIcon(true));
+                if(drop == null) inv.setItem(i,null);
+                else inv.setItem(i,drop.getIcon(true));
             }
             loc2.subtract(0,1,0);
         }
