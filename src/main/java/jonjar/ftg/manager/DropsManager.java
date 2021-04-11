@@ -16,7 +16,7 @@ import java.util.*;
 
 public class DropsManager {
     private final static ArrayList<Inventory> guiList = new ArrayList<>();
-    public final static String NAME = "Drops";
+    public final static String NAME = "Drop";
     public static LinkedHashMap<Integer,Drop> dropsMap = new LinkedHashMap<>();
 
     private final static Inventory CONFIRM_GUI;
@@ -57,13 +57,13 @@ public class DropsManager {
 
             ItemMeta im = is.getItemMeta();
 
-            im.setDisplayName("이전");
+            im.setDisplayName(ChatColor.WHITE+"이전");
             is.setItemMeta(im);
 
-            im.setDisplayName("다음");
+            im.setDisplayName(ChatColor.WHITE+"다음");
             is2.setItemMeta(im);
 
-            im.setDisplayName("뽑기");
+            im.setDisplayName(ChatColor.WHITE+"뽑기");
             pick.setItemMeta(im);
 
             im.setDisplayName(ChatColor.RED+""+ChatColor.BOLD+"삭제하기");
@@ -86,6 +86,10 @@ public class DropsManager {
 
         for(int i=0;i<Drop.count;i++){
             Drop drop = dropsMap.get(i);
+            if(drop == null) {
+                getGUI(i / 45).setItem(i % 45,null);
+                continue;
+            }
             ItemStack is = drop.getIcon();
             if(delete) is.setType(Material.RED_SHULKER_BOX);
             getGUI(i / 45).setItem(i % 45,is);
@@ -121,11 +125,11 @@ public class DropsManager {
                 if(event.isShiftClick()) num = 10;
 
                 if (itemStack.getType() == Material.ORANGE_SHULKER_BOX || itemStack.getType() == Material.WHITE_SHULKER_BOX) {
-                    Drop drop = dropsMap.get(Integer.parseInt(event.getCurrentItem().getItemMeta().getDisplayName().split("번")[0]));
+                    Drop drop = dropsMap.get(Integer.parseInt(event.getCurrentItem().getItemMeta().getDisplayName().split("번")[0].replaceFirst(ChatColor.WHITE.toString(),"")));
                     drop.inventory.setItem(27, drop.getIcon());
                     event.getWhoClicked().openInventory(drop.inventory);
                 } if (itemStack.getType() == Material.RED_SHULKER_BOX) {
-                    Drop drop = dropsMap.get(Integer.parseInt(event.getCurrentItem().getItemMeta().getDisplayName().split("번")[0]));
+                    Drop drop = dropsMap.get(Integer.parseInt(event.getCurrentItem().getItemMeta().getDisplayName().split("번")[0].replaceFirst(ChatColor.WHITE.toString(),"")));
                     drop.remove();
                     event.getInventory().setItem(event.getRawSlot(),null);
                 } else if (event.getRawSlot() == 45) {
@@ -207,7 +211,7 @@ public class DropsManager {
         Drop(int modifier){
             this.modifier = modifier;
             Sum_modifier+=this.modifier;
-            this.inventory = Bukkit.createInventory(null,36,NAME+" "+count);
+
             if(blank.isEmpty()) {
                 id = count;
                 count++;
@@ -215,6 +219,8 @@ public class DropsManager {
                 id = blank.first();
                 blank.remove(id);
             }
+            this.inventory = Bukkit.createInventory(null,36,NAME+" "+id);
+
             dropsMap.put(id,this);
             this.inventory.setItem(27,getIcon());
 
@@ -257,7 +263,7 @@ public class DropsManager {
             ShulkerBox sb = (ShulkerBox) bsm.getBlockState();
             sb.getInventory().setContents(Arrays.copyOfRange(inventory.getContents(),0,26));
 
-            meta.setDisplayName(this.toString());
+            meta.setDisplayName(ChatColor.WHITE+this.toString());
 
             ArrayList<String> lore = new ArrayList<>();
             lore.add(getChance()+"%");
