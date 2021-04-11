@@ -153,7 +153,7 @@ public class DropsManager {
                 } else if (event.getRawSlot() == 50) {
                     event.getWhoClicked().openInventory(getRandomDrop().inventory);
                 } else if (event.getRawSlot() == 53) {
-                    event.getWhoClicked().openInventory(getGUI(Math.min(10,Integer.parseInt(name[2]) + num)));
+                    event.getWhoClicked().openInventory(getGUI(Math.min(9,Integer.parseInt(name[2]) + num)));
                 }
 
             } else {
@@ -204,17 +204,52 @@ public class DropsManager {
     }
 
 
-    public static void regiser(){
-        Location loc = new Location(FTG.world,-22,8,1);
+    public static void load(){
+        Location loc1 = new Location(FTG.world,-22,8,1);
+        Location loc2 = new Location(FTG.world,-22,8,4);
+
         Inventory inv ;
-        inv = ContainerUtil.getFromChest(loc);
-
-        for(int i = 0; i<45; i++){
-            ItemStack stack = inv.getItem(i);
-            int modifier = Integer.parseInt(stack.getItemMeta().getLore().get(1).split(" ")[1].split("/")[0]);
-            new Drop(modifier).setDropInventory(ContainerUtil.getFromShulker(stack));
+        for(int page = 0; page<5;page++) {
+            inv = ContainerUtil.getFromChest(loc1);
+            for (int i = 0; i < 45; i++) {
+                ItemStack stack = inv.getItem(i);
+                int modifier = Integer.parseInt(stack.getItemMeta().getLore().get(1).split(" ")[1].split("/")[0]);
+                new Drop(modifier).setDropInventory(ContainerUtil.getFromShulker(stack));
+            }
+            loc1.subtract(0,1,0);
         }
+        for(int page = 5; page<10;page++) {
+            inv = ContainerUtil.getFromChest(loc2);
+            for (int i = 0; i < 45; i++) {
+                ItemStack stack = inv.getItem(i);
+                int modifier = Integer.parseInt(stack.getItemMeta().getLore().get(1).split(" ")[1].split("/")[0]);
+                new Drop(modifier).setDropInventory(ContainerUtil.getFromShulker(stack));
+            }
+            loc2.subtract(0,1,0);
+        }
+    }
 
+    public static void save(){
+        Location loc1 = new Location(FTG.world,-22,8,1);
+        Location loc2 = new Location(FTG.world,-22,8,4);
+        Inventory inv ;
+
+        for(int page = 0; page<5;page++) {
+            inv = ContainerUtil.getFromChest(loc1);
+            for (int i = 0; i < 45; i++) {
+                Drop drop = dropsMap.get(45*page+i);
+                inv.setItem(i,drop.getIcon(true));
+            }
+            loc1.subtract(0,1,0);
+        }
+        for(int page = 5; page<10;page++) {
+            inv = ContainerUtil.getFromChest(loc2);
+            for (int i = 0; i < 45; i++) {
+                Drop drop = dropsMap.get(45*page+i);
+                inv.setItem(i,drop.getIcon(true));
+            }
+            loc2.subtract(0,1,0);
+        }
     }
 
 
@@ -238,7 +273,7 @@ public class DropsManager {
             Sum_modifier+=this.modifier;
 
             if(blank.isEmpty()) {
-                if(count>=5*45) throw new IllegalStateException();
+                if(count>=10*45) throw new IllegalStateException();
                 id = count;
                 count++;
             }else {
