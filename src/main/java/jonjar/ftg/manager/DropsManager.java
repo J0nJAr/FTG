@@ -1,11 +1,15 @@
 package jonjar.ftg.manager;
 
+import jonjar.ftg.FTG;
+import jonjar.ftg.util.ContainerUtil;
 import jonjar.ftg.util.MsgSender;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.ShulkerBox;
 import org.bukkit.entity.Player;
+import org.bukkit.event.EventException;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
@@ -122,7 +126,7 @@ public class DropsManager {
                     return;
                 }
                 int num = 1;
-                if(event.isShiftClick()) num = 10;
+                if(event.isShiftClick()) num = 5;
 
                 if (itemStack.getType() == Material.ORANGE_SHULKER_BOX || itemStack.getType() == Material.WHITE_SHULKER_BOX) {
                     Drop drop = dropsMap.get(Integer.parseInt(event.getCurrentItem().getItemMeta().getDisplayName().split("번")[0].replaceFirst(ChatColor.WHITE.toString(),"")));
@@ -141,11 +145,15 @@ public class DropsManager {
                     }
                     else event.getWhoClicked().openInventory(CONFIRM_GUI);
                 } else if (event.getRawSlot() == 49) {
-                    event.getWhoClicked().openInventory(new Drop().inventory);
+                    try{
+                    event.getWhoClicked().openInventory(new Drop().inventory);}
+                    catch (IllegalStateException e){
+                        MsgSender.getMsgSender().error(event.getWhoClicked(),"최대 보급 개수를 초과했습니다.");
+                    }
                 } else if (event.getRawSlot() == 50) {
                     event.getWhoClicked().openInventory(getRandomDrop().inventory);
                 } else if (event.getRawSlot() == 53) {
-                    event.getWhoClicked().openInventory(getGUI(Math.min(100,Integer.parseInt(name[2]) + num)));
+                    event.getWhoClicked().openInventory(getGUI(Math.min(10,Integer.parseInt(name[2]) + num)));
                 }
 
             } else {
@@ -196,6 +204,20 @@ public class DropsManager {
     }
 
 
+    public static void regiser(){
+        Location loc = new Location(FTG.world,-22,8,1);
+        Inventory inv ;
+        inv = ContainerUtil.getFromChest(loc);
+
+        for(int i = 0; i<45; i++){
+            ItemStack stack = inv.getItem(i);
+            int modifier = Integer.parseInt(stack.getItemMeta().getLore().get(1).split(" ")[1].split("/")[0]);
+            new Drop(modifier).setDropInventory(ContainerUtil.getFromShulker(stack));
+        }
+
+    }
+
+
     public static class Drop{
         private static int count = 0;//gui 이름 구분을 위한 숫자
         private static SortedSet<Integer> blank = new TreeSet<>();
@@ -203,6 +225,9 @@ public class DropsManager {
 
         private int modifier; //확률 관련 정수(경우의 수 느낌)
         public Inventory inventory;
+
+
+
 
         Drop(){
             this(1);
@@ -213,12 +238,14 @@ public class DropsManager {
             Sum_modifier+=this.modifier;
 
             if(blank.isEmpty()) {
+                if(count>=5*45) throw new IllegalStateException();
                 id = count;
                 count++;
             }else {
                 id = blank.first();
                 blank.remove(id);
             }
+
             this.inventory = Bukkit.createInventory(null,36,NAME+" "+id);
 
             dropsMap.put(id,this);
@@ -248,6 +275,9 @@ public class DropsManager {
         }
 
         public ItemStack getIcon(){
+            return getIcon(false);
+        }
+        public ItemStack getIcon(boolean containsItems){
             Material box;
             if(modifier==0){
                 box = Material.WHITE_SHULKER_BOX;
@@ -255,13 +285,9 @@ public class DropsManager {
                 box = Material.ORANGE_SHULKER_BOX;
             }
 
-            ItemStack icon = new ItemStack(box,1);
+            ItemStack icon = containsItems ? ContainerUtil.toShuklerBox(box,inventory) : new ItemStack(box);
 
             ItemMeta meta = icon.getItemMeta();
-            BlockStateMeta bsm = (BlockStateMeta) meta;
-
-            ShulkerBox sb = (ShulkerBox) bsm.getBlockState();
-            sb.getInventory().setContents(Arrays.copyOfRange(inventory.getContents(),0,26));
 
             meta.setDisplayName(ChatColor.WHITE+this.toString());
 

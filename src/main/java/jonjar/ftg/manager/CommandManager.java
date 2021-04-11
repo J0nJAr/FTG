@@ -142,6 +142,8 @@ public class CommandManager extends MsgSender implements CommandExecutor {
             msg_cmt(p, getCmt_Click(ChatColor.GRAY +"방어구 재지급", new String[]{"debug", "armor"}));
             msg_cmt(p, getCmt_Click(ChatColor.GRAY + "fastStart 2", new String[]{"debug", "fastStart", "2"}));
             msg_cmt(p, getCmt_Click(ChatColor.GRAY + "fastStart 3", new String[]{"debug", "fastStart", "3"}));
+            msg_cmt(p, getCmt_Click(ChatColor.GRAY + "drop", new String[]{"debug", "drop"}));
+            msg_cmt(p, getCmt_Click(ChatColor.GRAY + "test", new String[]{"debug", "test"}));
             msg_cmt(p, getCmt_Click("RELOAD", ChatColor.DARK_RED+""+ChatColor.BOLD+"FORCE RELOAD" ,new String[]{"confirm"}));
         }
         else {
@@ -185,6 +187,12 @@ public class CommandManager extends MsgSender implements CommandExecutor {
                     break;
                 case "getTile" :
                     msg(p,LocationUtil.getClosestTile(p.getLocation()).toString());
+                    break;
+                case "drop" :
+                    p.getInventory().addItem(DropsManager.getRandomDrop().getIcon(true));
+                    break;
+                case "test" :
+                    p.openInventory(ContainerUtil.getFromShulker(DropsManager.getRandomDrop().getIcon()));
                     break;
             }
         }
