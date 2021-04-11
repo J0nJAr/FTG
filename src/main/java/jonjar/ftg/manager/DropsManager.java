@@ -214,7 +214,7 @@ public class DropsManager {
             for (int i = 0; i < 45; i++) {
                 ItemStack stack = inv.getItem(i);
                 if(stack==null) continue;
-                int modifier = Integer.parseInt(stack.getItemMeta().getLore().get(1).split(" ")[1].split("/")[0]);
+                int modifier = Integer.parseInt(stack.getItemMeta().getLore().get(1).split(" ")[2].split("/")[0]);
                 new Drop(modifier).setDropInventory(ContainerUtil.getFromShulker(stack));
             }
             loc1.subtract(0,1,0);
@@ -224,7 +224,7 @@ public class DropsManager {
             for (int i = 0; i < 45; i++) {
                 ItemStack stack = inv.getItem(i);
                 if(stack==null) continue;
-                int modifier = Integer.parseInt(stack.getItemMeta().getLore().get(1).split(" ")[1].split("/")[0]);
+                int modifier = Integer.parseInt(stack.getItemMeta().getLore().get(1).split(" ")[2].split("/")[0]);
                 new Drop(modifier).setDropInventory(ContainerUtil.getFromShulker(stack));
             }
             loc2.subtract(0,1,0);
