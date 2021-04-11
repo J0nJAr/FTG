@@ -213,6 +213,7 @@ public class DropsManager {
             inv = ContainerUtil.getFromChest(loc1);
             for (int i = 0; i < 45; i++) {
                 ItemStack stack = inv.getItem(i);
+                if(stack==null) continue;
                 int modifier = Integer.parseInt(stack.getItemMeta().getLore().get(1).split(" ")[1].split("/")[0]);
                 new Drop(modifier).setDropInventory(ContainerUtil.getFromShulker(stack));
             }
@@ -222,6 +223,7 @@ public class DropsManager {
             inv = ContainerUtil.getFromChest(loc2);
             for (int i = 0; i < 45; i++) {
                 ItemStack stack = inv.getItem(i);
+                if(stack==null) continue;
                 int modifier = Integer.parseInt(stack.getItemMeta().getLore().get(1).split(" ")[1].split("/")[0]);
                 new Drop(modifier).setDropInventory(ContainerUtil.getFromShulker(stack));
             }
