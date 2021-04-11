@@ -5,17 +5,14 @@ package jonjar.ftg.manager;
 
 import jonjar.ftg.FTG;
 import jonjar.ftg.entity.Team;
-import jonjar.ftg.manager.CommandManager;
 
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabCompleter;
-import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Set;
 
 public class TabCompleteManager implements TabCompleter {
 
@@ -34,6 +31,7 @@ public class TabCompleteManager implements TabCompleter {
                 case 2:
                     if(args[0].equalsIgnoreCase("team")) return getSortedArgs(args[1],CommandManager.CMD_TEAM);
                     if(args[0].equalsIgnoreCase("debug")) return getSortedArgs(args[1],CommandManager.CMD_DEBUG);
+                    if(args[0].equalsIgnoreCase("stats")) return getSortedArgs(args[1],new ArrayList(CommandManager.fileMap.keySet()));
                 case 3:
                     if(args[0].equalsIgnoreCase("team")){
                         if(args[1].equalsIgnoreCase("join")) {

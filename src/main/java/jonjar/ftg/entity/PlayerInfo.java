@@ -50,26 +50,7 @@ public class PlayerInfo {
     public boolean isDead;
     private Team team;
 
-    public static class PlayerStats{ //CHECK:전적관리 위해서 일단 분리해둠.
-        private PlayerInfo playerInfo;
 
-        public int kill; // 킬
-        public int death ; // 데스
-        public int tile_assist; // 타일 점령 도움
-
-        PlayerStats(PlayerInfo pi){
-            playerInfo=pi;
-            reset();
-        }
-
-        public void reset() {
-            this.kill = 0;
-            this.death = 0;
-            this.tile_assist = 0;
-
-        }
-
-    }
 
     public PlayerStats stats;
 
@@ -84,11 +65,11 @@ public class PlayerInfo {
         PlayerInfoList.put(name.toLowerCase(), this);
     }
     @Deprecated//수정하기 귀찮아서 일단 태그만 달아둠.
-    public int getKill(){ return stats.kill; }
+    public int getKill(){ return (int) stats.stat_map.get(PlayerStats.Stats.kill); }
     @Deprecated
-    public int getDeath() { return stats.death; }
+    public int getDeath() { return (int) stats.stat_map.get(PlayerStats.Stats.death); }
     @Deprecated
-    public int getTileAssisted() { return stats.tile_assist; }
+    public int getTileAssisted() { return (int) stats.stat_map.get(PlayerStats.Stats.tile_assist); }
 
     public Tile getNowLocation() { return this.nowLocation; }
     public String getName() { return this.name; }
@@ -97,8 +78,7 @@ public class PlayerInfo {
     public boolean isObserver() { return this.observe; }
     public boolean isDead() { return this.isDead; }
 
-    @Deprecated
-    public void addTileAssisted() { stats.tile_assist++; }
+
 
     public void reset() {
         this.stats.reset();
@@ -151,7 +131,7 @@ public class PlayerInfo {
 
                     if (t.cantRespawn) { //리스폰 불가인지 확인하고, 불가이면 return해서 끊기.
                         return;  //리스폰 불가일때 끊기
-                    }//TODO: 팀 생존여부 확인.
+                    }
 
                     if(tick == 0){
                         p.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE,3,5,false,false));
@@ -212,13 +192,14 @@ public class PlayerInfo {
 
     @Deprecated
     public void addKill(){
-        stats.kill++;
+        stats.add(PlayerStats.Stats.kill);
     }
     @Deprecated
     public void addDeath(){
-        stats.death++;
+        stats.add(PlayerStats.Stats.death);
     }
-
+    @Deprecated
+    public void addTileAssisted() { stats.add(PlayerStats.Stats.tile_assist); }
     //public void capture
 
     public void equipKits(boolean reset){

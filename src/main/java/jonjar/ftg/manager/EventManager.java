@@ -105,10 +105,13 @@ public class EventManager implements Listener {
 
         if(GameManager.isFever&&t.isSurvived&&!ei.isDead){
             t.survivedPlayerNum--;
-            if(t.survivedPlayerNum==0){
+            if(t.survivedPlayerNum==0){ //해당 팀 탈락 확인
                 t.isSurvived = false;
                 MsgSender.getMsgSender().broadcast(t.getColor().getKoreanName(t.getColor().getChatColor().toString()+ChatColor.BOLD)+"팀"+ ChatColor.RED +ChatColor.BOLD+"이 탈락했습니다.");
-                //TODO:팀 탈락 메세지 & 이벤트
+                /*TODO:팀 탈락 이벤트
+                       팀 등수 확인하기
+                       우승 이벤트 필요.
+                */
             }
         }
 

@@ -153,6 +153,10 @@ public class Team {
         return is;
     }
 
+    @Override
+    public String toString(){
+        return this.getColor().name();
+    }
     public enum TeamColor {
 
         BLUE(ChatColor.AQUA, BarColor.BLUE, Color.BLUE ,11, "블루", 0, 12),

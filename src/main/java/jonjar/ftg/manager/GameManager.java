@@ -11,6 +11,7 @@ import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
+import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
@@ -19,12 +20,20 @@ import org.bukkit.scoreboard.DisplaySlot;
 import org.bukkit.scoreboard.Objective;
 import org.bukkit.scoreboard.Scoreboard;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashSet;
 
 public class GameManager extends MsgSender {
 
     private final FTG plugin;
+    private YamlManager ym;
+
+    public FileConfiguration getYaml(){
+        return ym.getYaml();
+    }
+
     public GameManager(FTG main){
         this.plugin = main;
     }
@@ -68,6 +77,8 @@ public class GameManager extends MsgSender {
                     t.isSurvived = true;
                     t.cantRespawn = false;
                 }
+                SimpleDateFormat format1 = new SimpleDateFormat ("yyyy_MM_dd_HH_mm_ss");
+                ym = new YamlManager("GAMEDATA/"+format1.format(new Date()));
             } else {
                 error(p, "§c팀 배분을 받지 못한 플레이어가 있습니다.");
             }
@@ -85,6 +96,9 @@ public class GameManager extends MsgSender {
     }
 
     private void end(){
+        Team.TeamNames.forEach(t ->ym.getYaml().set(t+".place","등수를 이곳에 입력"));//TODO 등수를 이곳에 입력
+        PlayerInfo.PlayerInfoList.values().forEach(pi -> pi.stats.saveData());
+        ym.saveYaml();
         STATE = GameState.WAIT;
         runnable.cancel();
         runnable = null;

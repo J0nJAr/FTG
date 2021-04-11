@@ -12,16 +12,18 @@ import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.ChatColor;
-import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
-import org.bukkit.block.Chest;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
+import org.bukkit.configuration.MemorySection;
+import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 
+import java.io.File;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 
 
@@ -66,6 +68,8 @@ public class CommandManager extends MsgSender implements CommandExecutor {
             team(p, args);
         else if(args[0].equalsIgnoreCase("observer"))
             observer(p, args);
+        else if(args[0].equalsIgnoreCase("stats"))
+            stats(p, args);
         else if(args[0].equalsIgnoreCase("debug"))
             debug(p,args);
         else
@@ -73,6 +77,8 @@ public class CommandManager extends MsgSender implements CommandExecutor {
         
         return true;
     }
+
+
 
     private void drops(Player p, String[] args) {
         if(args.length == 1)
@@ -119,7 +125,37 @@ public class CommandManager extends MsgSender implements CommandExecutor {
             tm.help(p);
 
     }
-
+    public static HashMap<String,File> fileMap = new HashMap<>();
+    private void stats(Player p, String[] args) {
+        getStatsList();
+        if(args.length == 1){
+            fileMap.keySet().forEach(s -> msg_cmt(p,getCmt_Click(ChatColor.BOLD +"["+s+"]", new String[]{"stats", s})));
+        }
+        else {
+            File file = fileMap.get(args[1]);
+            if(file == null){
+                error(p,"유효하지 않은 이름입니다.");
+                error(p, "올바른 명령어 : /ftg stats [파일이름]");
+            }
+            YamlConfiguration yaml = YamlConfiguration.loadConfiguration(file);
+            for(String team: yaml.getKeys(false)){
+                msg(p,team);
+                msg(p, yaml.getString(team+".place")+"위");
+                msg(p,yaml.getString(team+".Player"));
+                for(String player: yaml.getStringList(team+".Player")){
+                    msg(p,player);
+                    msg(p, "킬" +yaml.getString(team+"."+player+".kill"));
+                    msg(p, "죽음" +yaml.getString(team+"."+player+".death"));
+                    msg(p, "점렴"+yaml.getString(team+"."+player+".file_assistance"));
+                }
+            }
+        }
+    }
+    private static void getStatsList() {
+         for(File file:new File("plugins/FTG/GAMEDATA/").listFiles()){
+             fileMap.put(file.getName(),file);
+         }
+    }
     private void observer(Player p, String[] args) {
         if(args.length == 1)
             error(p, "올바른 명령어 : /ftg observer [PLAYER]");

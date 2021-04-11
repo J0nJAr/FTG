@@ -49,5 +49,11 @@ public class MsgSender {
     public TextComponent getCmt_Click(String text, String[] args){
         return getCmt_Click("FTG",text ,args);
     }
+    public TextComponent getCmt_Click(String text,String arg){
+        TextComponent result = new TextComponent(TextComponent.fromLegacyText(text));
+        result.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND,
+                "/FTG "+text+" "+arg));
+        return result;
+    }
 
 }

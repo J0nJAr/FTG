@@ -3,13 +3,11 @@ package jonjar.ftg;
 import jonjar.ftg.entity.PlayerInfo;
 import jonjar.ftg.entity.Team;
 import jonjar.ftg.entity.Tile;
-import jonjar.ftg.manager.CommandManager;
-import jonjar.ftg.manager.EventManager;
-import jonjar.ftg.manager.GameManager;
-import jonjar.ftg.manager.TabCompleteManager;
+import jonjar.ftg.manager.*;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 
+import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -21,10 +19,12 @@ public final class FTG extends JavaPlugin {
 
     public static FTG INSTANCE = null;
 
-    private GameManager gm;
+    public GameManager gm;
     private EventManager em;
     private TabCompleteManager tcm;
+    private YamlManager ym;
 
+    public FileConfiguration config;
     public static World world;
 
     CommandManager cm;
@@ -50,6 +50,9 @@ public final class FTG extends JavaPlugin {
         gm = new GameManager(this);
         em = new EventManager(this);
         tcm = new TabCompleteManager(this);
+        ym = new YamlManager("config");
+
+        config = ym.getYaml();
 
         Tile.registerTiles();
         Tile.registerAllNearTileList();
@@ -57,6 +60,7 @@ public final class FTG extends JavaPlugin {
             if(e.getCustomName() != null)
                 e.remove();
         }
+
 
         Bukkit.getPluginManager().registerEvents(em, this);
 
@@ -76,6 +80,7 @@ public final class FTG extends JavaPlugin {
             Objective obj = sc.registerNewObjective("tile", "dummy");
             obj.setDisplayName("§l점령한 타일");
         }
+
 
     }
 
