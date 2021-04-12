@@ -100,7 +100,6 @@ public class GameManager extends MsgSender {
         //TODO 등수를 이곳에 입력
         for (String t : Team.TeamNames) {
             ym.getYaml().set(t + ".place", "등수를 이곳에 입력");
-            ym.getYaml().set(t+ ".place","Player");
         }
         PlayerInfo.PlayerInfoList.values().forEach(pi -> pi.stats.saveData());
         ym.saveYaml();
@@ -229,7 +228,6 @@ public class GameManager extends MsgSender {
                             } else if(max == i){
                                 winners.add(t);
                             }
-                            // TODO : 동점 시 그... 뭐드라? 리스폰 금지압수
                         }
                     }
                     if(winners.size()!=1){//무승부

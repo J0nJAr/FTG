@@ -37,7 +37,7 @@ public class CommandManager extends MsgSender implements CommandExecutor {
         tm = new TeamManager();
         main = plugin;
     }
-    public static final List<String> CMD_MAIN = Arrays.asList("start","stop","pause","team","observer","debug","drops");
+    public static final List<String> CMD_MAIN = Arrays.asList("start","stop","pause","team","observer","debug","drops","stats");
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
 
@@ -146,9 +146,9 @@ public class CommandManager extends MsgSender implements CommandExecutor {
                 ConfigurationSection team_yml = yaml.getConfigurationSection(team+".Player");
                 for(String player: team_yml.getKeys(false)){
                     msg(p,player);
-                    msg(p, "킬" +team_yml.getString(player+".kill"));
-                    msg(p, "죽음" +team_yml.getString(player+".death"));
-                    msg(p, "점령"+team_yml.getString(player+".file_assistance"));
+                    msg(p, "킬" +team_yml.getInt(player+".kill"));
+                    msg(p, "죽음" +team_yml.getInt(player+".death"));
+                    msg(p, "점령"+team_yml.getInt(player+".file_assistance"));
                 }
                 }
                 catch (NullPointerException ne){
