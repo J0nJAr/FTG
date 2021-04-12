@@ -4,6 +4,8 @@ import jonjar.ftg.FTG;
 import jonjar.ftg.entity.PlayerInfo;
 import jonjar.ftg.entity.Team;
 import jonjar.ftg.entity.Tile;
+import jonjar.ftg.file.DataManager;
+import jonjar.ftg.file.YamlManager;
 import jonjar.ftg.util.ContainerUtil;
 import jonjar.ftg.util.MsgSender;
 import net.md_5.bungee.api.ChatMessageType;
@@ -21,7 +23,6 @@ import org.bukkit.scoreboard.Objective;
 import org.bukkit.scoreboard.Scoreboard;
 
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
 
@@ -79,7 +80,7 @@ public class GameManager extends MsgSender {
                     t.cantRespawn = false;
                 }
                 SimpleDateFormat format1 = new SimpleDateFormat ("yyyy_MM_dd_HH_mm_ss");
-                ym = new YamlManager("GAMEDATA/"+format1.format(new Date()));
+                ym = new DataManager(format1.format(new Date()));
             } else {
                 error(p, "§c팀 배분을 받지 못한 플레이어가 있습니다.");
             }

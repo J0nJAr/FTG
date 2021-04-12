@@ -1,12 +1,9 @@
 package jonjar.ftg.entity;
 
 import jonjar.ftg.FTG;
-import jonjar.ftg.manager.YamlManager;
 import org.bukkit.configuration.file.FileConfiguration;
 
-import java.util.Calendar;
 import java.util.EnumMap;
-import java.util.HashMap;
 
 public class PlayerStats{
     private PlayerInfo playerInfo;

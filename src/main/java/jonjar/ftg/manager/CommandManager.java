@@ -137,6 +137,7 @@ public class CommandManager extends MsgSender implements CommandExecutor {
             if(file == null){
                 error(p,"유효하지 않은 이름입니다.");
                 error(p, "올바른 명령어 : /ftg stats [파일이름]");
+                return;
             }
             YamlConfiguration yaml = YamlConfiguration.loadConfiguration(file);
             for(String team: yaml.getKeys(false)){

@@ -3,6 +3,8 @@ package jonjar.ftg;
 import jonjar.ftg.entity.PlayerInfo;
 import jonjar.ftg.entity.Team;
 import jonjar.ftg.entity.Tile;
+import jonjar.ftg.file.ConfigManger;
+import jonjar.ftg.file.YamlManager;
 import jonjar.ftg.manager.*;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
@@ -50,7 +52,7 @@ public final class FTG extends JavaPlugin {
         gm = new GameManager(this);
         em = new EventManager(this);
         tcm = new TabCompleteManager(this);
-        ym = new YamlManager("config");
+        ym = new ConfigManger();
 
         config = ym.getYaml();
         ym.saveYaml();

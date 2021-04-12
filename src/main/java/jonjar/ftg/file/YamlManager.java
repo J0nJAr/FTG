@@ -1,4 +1,4 @@
-package jonjar.ftg.manager;
+package jonjar.ftg.file;
 
 import jonjar.ftg.FTG;
 import org.bukkit.Bukkit;
@@ -9,24 +9,29 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import java.io.File;
 import java.io.IOException;
 
-public class YamlManager {
+public abstract class YamlManager {
     private File yamlFile;
     private YamlConfiguration yaml;
     private final String name;
+    private final boolean fromDefault;
+    private final String DEFAULT_PATH = "plugins/FTG/";
 
     public YamlManager(String name){
+        this(null,name,true);
+    }
+    public YamlManager(String path, String name,boolean fromDefault){
         this.name = name;
-        loadYaml();
+        this.fromDefault = fromDefault;
+        yamlFile = new File(fromDefault ? DEFAULT_PATH+path:path,name+".yml");
+        yaml= YamlConfiguration.loadConfiguration(yamlFile);
     }
 
-    private void loadYaml() {
-
-        yamlFile = new File("plugins/FTG",name+".yml");
+    protected void loadYaml() {
+        yamlFile = new File(DEFAULT_PATH,name+".yml");
         yaml= YamlConfiguration.loadConfiguration(yamlFile);
-
         try {
             if (!yamlFile.exists()) {
-                if(name=="config") yaml.set("time",320);
+                setDefault(yaml);
                 yaml.save(yamlFile);
             }
             yaml.load(yamlFile);
@@ -34,6 +39,7 @@ public class YamlManager {
             localException.printStackTrace();
         }
     }
+    protected abstract void setDefault(YamlConfiguration yaml);
 
     public FileConfiguration getYaml(){
         return yaml;
