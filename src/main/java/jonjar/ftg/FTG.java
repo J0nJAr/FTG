@@ -25,9 +25,8 @@ public final class FTG extends JavaPlugin {
     public GameManager gm;
     private EventManager em;
     private TabCompleteManager tcm;
-    private YamlManager ym;
+    public ConfigManger config;
 
-    public FileConfiguration config;
     public static World world;
 
     CommandManager cm;
@@ -54,10 +53,7 @@ public final class FTG extends JavaPlugin {
         gm = new GameManager(this);
         em = new EventManager(this);
         tcm = new TabCompleteManager(this);
-        ym = new ConfigManger();
-
-        config = ym.getYaml();
-        ym.saveYaml();
+        config = new ConfigManger();
 
         Tile.registerTiles();
         Tile.registerAllNearTileList();

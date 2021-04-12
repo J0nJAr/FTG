@@ -60,7 +60,7 @@ public class GameManager extends MsgSender {
      */
 
     public void start(Player p){
-        GAME_DURATION_SEC = FTG.INSTANCE.config.getInt("time",320);
+        GAME_DURATION_SEC = FTG.INSTANCE.config.getSetting(ConfigManger.SETTINGS.time);
         if(runnable != null && !runnable.isCancelled()){
             error(p, "이미 게임이 시작되어있습니다.");
         } else {
@@ -227,6 +227,18 @@ public class GameManager extends MsgSender {
                         }
                     }
                     if(winners.size()!=1){//무승부
+
+                        if(FTG.INSTANCE.config.getSetting(ConfigManger.SETTINGS.fever)==0){
+                            StringBuilder sb = new StringBuilder().append("우승 팀 : ");
+                            for (Team t : winners){
+                                sb.append(t.getColor().getKoreanName()).append(ChatColor.WHITE).append(", ");
+                            }
+                            sb.delete(sb.length()-2,sb.length()-1);
+                            broadcast("============================");
+                            broadcast( sb.toString());
+                            broadcast("============================");
+                            end();
+                        }else {
                         StringBuilder sb = new StringBuilder().append("동률인 팀 : ");
                         for (Team t : Team.getTeams()) { //각 팀에서
                             if (winners.contains(t)) { //동률 팀인경우
@@ -267,6 +279,7 @@ public class GameManager extends MsgSender {
                         broadcast("현재 동률인 팀이 있으므로 리스폰이 금지되며, 최후의 팀이 나올 때 까지 게임이 진행됩니다.");
                         broadcast(sb.toString());
                         broadcast("============================");
+                        }
                     } else {
                         broadcast("============================");
                         broadcast("우승 팀 : " + winners.iterator().next().getColor().getKoreanName());

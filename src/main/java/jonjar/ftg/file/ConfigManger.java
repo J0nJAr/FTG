@@ -19,6 +19,26 @@ public class ConfigManger extends YamlManager{
 
     @Override
     protected void setDefault(YamlConfiguration yaml) {
-        yaml.set("time",320);
+        for(SETTINGS setting :SETTINGS.values()){
+            yaml.set(setting.path,setting.default_value);
+        }
+    }
+
+    public Integer getSetting(SETTINGS setting){
+        return getYaml().getInt(setting.path);
+    }
+
+    public enum SETTINGS{
+        time("time",320),
+        fever("fever",1);
+
+
+        String path;
+        int default_value;
+
+        SETTINGS(String path,int default_value){
+            this.path=path;
+            this.default_value = default_value;
+        }
     }
 }

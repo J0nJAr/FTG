@@ -1,10 +1,13 @@
 package jonjar.ftg.file;
 
+import jonjar.ftg.FTG;
 import jonjar.ftg.entity.PlayerInfo;
 import jonjar.ftg.entity.Team;
+import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.YamlConfiguration;
 
 import java.util.EnumMap;
+import java.util.logging.Level;
 
 public class DataManager extends YamlManager{
     public static void loadInstance(){
@@ -16,9 +19,7 @@ public class DataManager extends YamlManager{
 
     @Override
     protected void setDefault(YamlConfiguration yaml) {
-        for (String t : Team.TeamNames) {
-            this.getYaml().set(t + ".place", "등수를 이곳에 입력");
-        }
+        saveData();
     }
 
     public void saveData(){
@@ -32,7 +33,6 @@ public class DataManager extends YamlManager{
         }
     }
     public void resetData(){
-        YamlConfiguration data = getYaml();
         for (String t : Team.TeamNames) {
             Team team = Team.getTeamByName(t);
             team.stats.reset();
@@ -45,11 +45,10 @@ public class DataManager extends YamlManager{
     private static abstract class AbstractStats <E extends Enum<E>>{
 
         protected AbstractStats(){
-            reset();
         }
 
-        protected abstract void reset();
-        protected abstract void saveData(YamlConfiguration data);
+        public abstract void reset();
+        public abstract void saveData(YamlConfiguration data);
     }
     public static class TeamStats extends AbstractStats{
         private final Team team;
@@ -67,6 +66,7 @@ public class DataManager extends YamlManager{
                 stat_map.put(stats,0);
             }
         }
+
         @Override
         public void saveData(YamlConfiguration data){
             for(Stats stats :Stats.values()){

@@ -17,7 +17,7 @@ public abstract class YamlManager {
     private final String DEFAULT_PATH = "plugins/FTG/";
 
     public YamlManager(String name){
-        this(null,name,true);
+        this("",name,true);
     }
     public YamlManager(String path, String name,boolean fromDefault){
         this.name = name;
@@ -51,4 +51,5 @@ public abstract class YamlManager {
             e.printStackTrace();
         }
     }
+
 }
