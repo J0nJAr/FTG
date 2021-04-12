@@ -17,7 +17,9 @@ import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.Set;
 import java.util.UUID;
 
 public class PlayerInfo {
@@ -35,6 +37,10 @@ public class PlayerInfo {
             if(pi.getUUID().toString().equalsIgnoreCase(uuid)) return pi;
         }
         return null;
+    }
+
+    public static Collection<PlayerInfo> getPlayerInfos(){
+        return PlayerInfoList.values();
     }
 
 
@@ -98,11 +104,16 @@ public class PlayerInfo {
         respawnTimer = new BukkitRunnable() {
             public int tick = RESPWAN_TICK;
 
+            @Override
+            public void cancel(){
+                isDead = false;
+                super.cancel();
+            }
+
             public void run(){
 
                 if(GameManager.STATE != GameManager.GameState.START){
-                    isDead = false;
-                    this.cancel();
+                    cancel();
                     return;
                 }
 

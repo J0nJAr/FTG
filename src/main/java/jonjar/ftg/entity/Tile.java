@@ -18,6 +18,7 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scoreboard.Scoreboard;
+import sun.awt.image.ImageWatched;
 
 
 import java.util.*;
@@ -33,7 +34,7 @@ public class Tile {
 
 
     public static final Location LOCATION_0 =  new Location(FTG.world,153D,5D,-52D);
-    public static final int NEED_DOMINATE_TICK = 50;
+    public static final float DOMINATE_RATIO = 0.01F;
 
     private ArrayList<Set<Tile>> nearTileList; //거리별 타일
     private HashMap<Tile,Integer> tileDistanceList;//타일별 거리
@@ -55,7 +56,7 @@ public class Tile {
     private boolean isMasterTile;
 
     //
-    private int state_tick = 0;
+    private HashMap<Team.TeamColor, Float> progress;
 
     private final HashMap<Team, List<Player>> PlayerList;
 
@@ -71,6 +72,10 @@ public class Tile {
         this.registerLocations();
         nearTileList = new ArrayList<>();
         PlayerList = new HashMap<>();
+        progress = new HashMap<>();
+        for(Team.TeamColor tc : Team.TeamColor.values()){
+            progress.put(tc, 0F);
+        }
 
         this.runnable = new TileRunnable();
         runnable.runTaskTimer(FTG.INSTANCE, 0L, 2L);
@@ -80,7 +85,6 @@ public class Tile {
         Bukkit.broadcastMessage("=== tiles info ===");
         Bukkit.broadcastMessage("own : " + own);
         Bukkit.broadcastMessage("attempt : " + attempt);
-        Bukkit.broadcastMessage("state : " + state_tick);
 
         for(Team t : PlayerList.keySet()){
             Bukkit.broadcastMessage("PlayerList : ");
@@ -146,8 +150,55 @@ public class Tile {
         return blockSet;
     }
 
-    public void processOccupation(Team t){
+    private void modifyProgress(Team.TeamColor tc, float amount){
+        float now = progress.get(tc);
+        now += amount;
+        if(now < 0F) now = 0F;
+        else if(now > 1F) now = 1F;
 
+        progress.put(tc, now);
+    }
+
+    public void processOccupation(Team t, int n){
+
+        float amount = DOMINATE_RATIO + ((n-1) * DOMINATE_RATIO / 2F);
+        if(own != null && own == t){
+            // 주인장이 점령하는 중
+            for(Team.TeamColor key : progress.keySet()){
+                if(t.getColor() != key)
+                    modifyProgress(key, -amount);
+            }
+            colorAll(t);
+        } else {
+            // 주인장 아닌놈이 점령하는 중
+            modifyProgress(t.getColor(), amount);
+            if(progress.get(t.getColor()) >= 1.0F){
+                // 점령!
+                for(Team.TeamColor key : progress.keySet()){
+                    if(t.getColor() != key)
+                        progress.put(key, 0F);
+                }
+
+                if(own != null){
+                    own.removeTile(this);
+                }
+
+                own = t;
+                List<Player> players = PlayerList.get(t);
+                for(Player ap : players){
+                    PlayerInfo pi = PlayerInfo.getPlayerInfo(ap);
+                    pi.addTileAssisted();
+                }
+                t.addTile(this);
+
+                colorAll(t);
+            } else {
+                colorAll(t, true);
+            }
+            runnable.flag_colored = false;
+        }
+
+        /*
         if(own != null && own == t){
             if(state_tick > 0) state_tick--;
             return;
@@ -196,18 +247,19 @@ public class Tile {
         }
         int r = rn.nextInt(size);
         */
-
-
     }
 
     public void resetInfo(){
         isMasterTile = false;
         PlayerList.clear();
-        state_tick = 0;
+        for(Team.TeamColor tc : Team.TeamColor.values()){
+            progress.put(tc, 0F);
+        }
         own = null;
         attempt = null;
         bar.removeAll();
         colorAll(null);
+        TILE_MAP.empty_tiles_set.add(this);
     }
 
     public void colorAll(Team t){
@@ -425,6 +477,7 @@ public class Tile {
             Tile tile = t.getColor().getBaseTile();
             tile.colorAll(t);
             tile.setMasterTile();
+            TILE_MAP.empty_tiles_set.remove(tile);
         }
     }
 
@@ -432,9 +485,11 @@ public class Tile {
 
     public static class TileMapC{
         private HashMap<Integer,ArrayList<Tile>> map;
+        public ArrayList<Tile> empty_tiles_set;
 
         TileMapC(){
             map = new HashMap<>();
+            empty_tiles_set = new ArrayList<>();
         }
 
         public void addTile(int x_index,Tile tile){
@@ -455,11 +510,20 @@ public class Tile {
             if(isValid(x_index,z_index)) return map.get(x_index).get(z_index);
             else return null;
         }
+
+        public Tile getRandomEmptyTile(){
+            if(empty_tiles_set.size() == 0) return null;
+            Random rn = new Random();
+            int i = rn.nextInt(empty_tiles_set.size());
+            return empty_tiles_set.get(i);
+        }
     }
 
     public class TileRunnable extends BukkitRunnable {
 
         private int tick = 0;
+
+
 
         private boolean flag_colored = false;
 
@@ -478,9 +542,8 @@ public class Tile {
             tick++;
             if(PlayerList.isEmpty()) return;
 
-            boolean same = false;
-            List<Team> dom = new ArrayList<Team>();
-            int max = 0;
+            HashMap<Team, Integer> dom = new HashMap<>();
+            ArrayList<Team> teams = new ArrayList<>();
             for(Team t : PlayerList.keySet()) {
                 if(t == null) continue;
 
@@ -495,21 +558,47 @@ public class Tile {
                     continue;
 
                 List<Player> in = PlayerList.get(t);
-                if (max < in.size()) {
-                    dom.clear();
-                    dom.add(t);
-                    max = in.size();
-                    same = false;
-                } else if (max > 0 && max == in.size()) {
-                    dom.add(t);
-                    same = true;
+                if(in.size() > 0) {
+                    dom.put(t, in.size());
+                    teams.add(t);
                 }
                 for (Player ap : in) {
                     bar.addPlayer(ap);
                 }
             }
 
+            if(dom.size() == 0){
+                bar.setTitle(own != null ? own.getColor().getKoreanName() + " 영토" : "§7빈 땅");
 
+                if(own != null && !flag_colored){
+                    colorAll(own, false);
+                    flag_colored = true;
+                }
+            } else if(dom.size() == 1){
+                Team t = teams.get(0);
+                if(!flag_colored){
+                    colorAll(t, true);
+                    flag_colored = true;
+                }
+                processOccupation(t, dom.get(t));
+                bar.setTitle(t.getColor().getKoreanName() + " 점령 중...");
+                bar.setProgress(progress.get(t.getColor()));
+            } else {
+                if(flag_colored){
+                    colorTeams(teams.toArray(new Team[0]));
+                    flag_colored = false;
+                }
+
+                int temp = (tick / 10) % dom.size();
+                int temp2 = temp + 1;
+                if(temp2 >= dom.size())
+                    temp2 = 0;
+                bar.setColor(teams.get(temp).getColor().getBarColor());
+                bar.setTitle(teams.get(temp).getColor().getChatColor() + ">> 대치" + teams.get(temp2).getColor().getChatColor() + " 중 <<");
+            }
+
+
+            /*
             if((dom.size() == 1 && dom.get(0) == own) || (dom.size() == 0 && own != null)){
                 bar.setTitle(own.getColor().getKoreanName() + "팀의 영토");
                 bar.setColor(own.getColor().getBarColor());
@@ -553,7 +642,7 @@ public class Tile {
 
             if(dom.size() == 1)
                 processOccupation(dom.get(0));
-
+            */
         }
 
     }

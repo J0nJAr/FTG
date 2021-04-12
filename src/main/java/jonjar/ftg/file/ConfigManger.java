@@ -29,9 +29,9 @@ public class ConfigManger extends YamlManager{
     }
 
     public enum SETTINGS{
+        drops("drops_temp", 10),
         time("time",320),
         fever("fever",1);
-
 
         String path;
         int default_value;

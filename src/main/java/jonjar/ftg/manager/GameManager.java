@@ -26,6 +26,8 @@ import org.bukkit.scoreboard.Scoreboard;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.Random;
+import java.util.UUID;
 
 public class GameManager extends MsgSender {
 
@@ -46,6 +48,7 @@ public class GameManager extends MsgSender {
     public static GameState STATE = GameState.WAIT;
 
     public static int GAME_DURATION_SEC;
+    public static int DROPS_TEMP;
 
     private int elapsed_tick;
     public static boolean PAUSE = false;
@@ -61,6 +64,7 @@ public class GameManager extends MsgSender {
 
     public void start(Player p){
         GAME_DURATION_SEC = FTG.INSTANCE.config.getSetting(ConfigManger.SETTINGS.time);
+        DROPS_TEMP = FTG.INSTANCE.config.getSetting(ConfigManger.SETTINGS.drops);
         if(runnable != null && !runnable.isCancelled()){
             error(p, "이미 게임이 시작되어있습니다.");
         } else {
@@ -130,11 +134,14 @@ public class GameManager extends MsgSender {
     private void reset(){
         this.elapsed_tick = 0;
 
-        for(Player ap : Bukkit.getOnlinePlayers()){ //FIXME:이거 잠깐 나가있으면 리셋 안되지 않니?
-            ap.getInventory().clear();
-            ap.teleport(FTG.world.getSpawnLocation());
-            ap.setGameMode(GameMode.ADVENTURE);
-            PlayerInfo pi = PlayerInfo.getPlayerInfo(ap);
+        for(PlayerInfo pi : PlayerInfo.getPlayerInfos()){ //FIXME:이거 잠깐 나가있으면 리셋 안되지 않니?
+            UUID uuid = pi.getUUID();
+            Player ap = Bukkit.getPlayer(uuid);
+            if(ap != null){
+                ap.getInventory().clear();
+                ap.teleport(FTG.world.getSpawnLocation());
+                ap.setGameMode(GameMode.ADVENTURE);
+            }
             pi.reset();
         }
 
@@ -143,15 +150,6 @@ public class GameManager extends MsgSender {
         Scoreboard sc = Bukkit.getScoreboardManager().getMainScoreboard();
         if(sc.getObjective(DisplaySlot.SIDEBAR) != null)
             sc.getObjective(DisplaySlot.SIDEBAR).setDisplaySlot(null);
-
-        /*
-        TODO :
-        1. 플레이어 모두 티피올 O
-        2. 플레이어 아이템 초기화 O
-        3. 팀 초기화 O
-        4. 타일 초기화 O
-        5. 점수 등 DB 초기화
-         */
     }
 
     public class MainGameTask extends BukkitRunnable {
@@ -185,8 +183,6 @@ public class GameManager extends MsgSender {
             String text = pi.getTeam().getColor().getKoreanName() + "팀 | §f" + pi.getKill() + "킬 " + pi.getDeath() + "데스 " + pi.getTileAssisted() + "점령";
             p.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText(text));
 
-            //
-
         }
     }
 
@@ -194,12 +190,34 @@ public class GameManager extends MsgSender {
 
     public class GameManagerTask extends BukkitRunnable {
         public int remain_sec = 0;
+        public final Random rn;
+
+        private int drops_now = 0;
+
+        public GameManagerTask(){
+            this.rn = new Random();
+        }
+
         public void run(){
             
             if(PAUSE)
                 return;
 
+            // 보급
+            if(elapsed_tick % DROPS_TEMP == 0){
+                int increase = rn.nextInt(6) + 2; // 2~7
+                drops_now += increase;
+                if(drops_now >= 100){
+                    DropsManager.spawnRandomDrop();
+                    MsgSender.getMsgSender().broadcast("보급 생성 뵤로롱");
+                    // CHECK : 비주얼은 마참이 해주겠지?그렇지?그렇지?그렇지?
+                    drops_now = 0;
+                }
+            }
+
             if(elapsed_tick % 20 == 0){
+
+
                 remain_sec = (GAME_DURATION_SEC * 20 - elapsed_tick + 200) / 20;
                 if(remain_sec == 0){
 
@@ -317,6 +335,7 @@ public class GameManager extends MsgSender {
                     break;
                 case 60:
                     broadcast("§7게임 설정 초기화 중...");
+                    Tile.TILE_MAP.empty_tiles_set.clear();
                     for(Tile t : Tile.TILE_SET) {
                         t.resetInfo();
                     }

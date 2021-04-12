@@ -139,6 +139,7 @@ public class Team {
     public void addTile(Tile tile){
         if(!tiles.contains(tile))
             tiles.add(tile);
+        Tile.TILE_MAP.empty_tiles_set.remove(tile);
         tile.colorAll(this);
         BOARD.getObjective("tile").getScore(team.getColor() + team.getName()).setScore(tiles.size());
         stats.add(DataManager.TeamStats.Stats.tiles,1);

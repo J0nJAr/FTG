@@ -1,12 +1,15 @@
 package jonjar.ftg.manager;
 
 import jonjar.ftg.FTG;
+import jonjar.ftg.entity.Tile;
 import jonjar.ftg.util.ContainerUtil;
 import jonjar.ftg.util.MsgSender;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.block.Block;
+import org.bukkit.block.Chest;
 import org.bukkit.block.ShulkerBox;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventException;
@@ -192,15 +195,34 @@ public class DropsManager {
         }
         int value = 1+random.nextInt(Sum_modifier);//
 
-        for(Drop drop : dropsMap.values()){
-            if(drop.modifier>=value){
+        for(Drop drop : dropsMap.values()) {
+            if (drop.modifier >= value) {
                 return drop;
-            }else{
-                value-=drop.modifier;
+            } else {
+                value -= drop.modifier;
             }
         }
 
+
         return null;
+    }
+
+    public static void spawnRandomDrop(){
+        Tile tile = Tile.TILE_MAP.getRandomEmptyTile();
+        if(tile == null) return;
+
+        Drop drop = getRandomDrop();
+        if(drop == null) return;
+
+        Location loc = tile.getCenter().clone().add(0, 1, 0);
+        // CHECK : macham.do("비주얼");
+        Block b = loc.getBlock();
+        b.setType(Material.CHEST);
+
+        Chest c = (Chest) b.getState();
+        Inventory inv = c.getInventory();
+        inv.setContents(drop.inventory.getContents());
+        c.update(true);
     }
 
 
