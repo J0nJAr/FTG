@@ -47,7 +47,7 @@ public class GameManager extends MsgSender {
 
     public static GameState STATE = GameState.WAIT;
 
-    public final static int GAME_DURATION_SEC = 5;
+    public static int GAME_DURATION_SEC;
 
     private int elapsed_tick;
     public static boolean PAUSE = false;
@@ -62,6 +62,7 @@ public class GameManager extends MsgSender {
      */
 
     public void start(Player p){
+        GAME_DURATION_SEC = FTG.INSTANCE.config.getInt("time",320);
         if(runnable != null && !runnable.isCancelled()){
             error(p, "이미 게임이 시작되어있습니다.");
         } else {
@@ -96,7 +97,11 @@ public class GameManager extends MsgSender {
     }
 
     private void end(){
-        Team.TeamNames.forEach(t ->ym.getYaml().set(t+".place","등수를 이곳에 입력"));//TODO 등수를 이곳에 입력
+        //TODO 등수를 이곳에 입력
+        for (String t : Team.TeamNames) {
+            ym.getYaml().set(t + ".place", "등수를 이곳에 입력");
+            ym.getYaml().set(t+ ".place","Player");
+        }
         PlayerInfo.PlayerInfoList.values().forEach(pi -> pi.stats.saveData());
         ym.saveYaml();
         STATE = GameState.WAIT;

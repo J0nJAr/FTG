@@ -53,6 +53,7 @@ public final class FTG extends JavaPlugin {
         ym = new YamlManager("config");
 
         config = ym.getYaml();
+        ym.saveYaml();
 
         Tile.registerTiles();
         Tile.registerAllNearTileList();

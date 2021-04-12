@@ -17,6 +17,7 @@ import org.bukkit.block.Block;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.MemorySection;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
@@ -141,12 +142,17 @@ public class CommandManager extends MsgSender implements CommandExecutor {
             for(String team: yaml.getKeys(false)){
                 msg(p,team);
                 msg(p, yaml.getString(team+".place")+"위");
-                msg(p,yaml.getString(team+".Player"));
-                for(String player: yaml.getStringList(team+".Player")){
+                try{
+                ConfigurationSection team_yml = yaml.getConfigurationSection(team+".Player");
+                for(String player: team_yml.getKeys(false)){
                     msg(p,player);
-                    msg(p, "킬" +yaml.getString(team+"."+player+".kill"));
-                    msg(p, "죽음" +yaml.getString(team+"."+player+".death"));
-                    msg(p, "점렴"+yaml.getString(team+"."+player+".file_assistance"));
+                    msg(p, "킬" +team_yml.getString(player+".kill"));
+                    msg(p, "죽음" +team_yml.getString(player+".death"));
+                    msg(p, "점령"+team_yml.getString(player+".file_assistance"));
+                }
+                }
+                catch (NullPointerException ne){
+                    error(p,"플레이어 목록을 조회하는 중에 오류가 발생했습니다.");
                 }
             }
         }

@@ -26,6 +26,7 @@ public class YamlManager {
 
         try {
             if (!yamlFile.exists()) {
+                if(name=="config") yaml.set("time",320);
                 yaml.save(yamlFile);
             }
             yaml.load(yamlFile);

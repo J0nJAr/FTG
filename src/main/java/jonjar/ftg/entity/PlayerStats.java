@@ -30,6 +30,7 @@ public class PlayerStats{
 
     public void saveData(){
         FileConfiguration data =  FTG.INSTANCE.gm.getYaml();
+        data.set(playerInfo.getTeam()+".Player",playerInfo.getName());
         for(Stats stats : Stats.values()){
         data.set(playerInfo.getTeam()+".Player."+playerInfo.getName()+"."+stats.name(),stat_map.get(stats));
         }

@@ -6,7 +6,7 @@
 
     <groupId>JonJAr</groupId>
     <artifactId>FTG</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <version>23T</version>
     <packaging>jar</packaging>
 
     <name>FTG</name>
@@ -70,6 +70,5 @@
             <artifactId>spigot-api</artifactId>
             <version>1.16.5-R0.1-SNAPSHOT</version>
             <scope>provided</scope>
-        </dependency>
-    </dependencies>
+        </dependency>    </dependencies>
 </project>
