@@ -1,5 +1,6 @@
 package jonjar.ftg.entity;
 
+import jonjar.ftg.file.DataManager;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Color;
@@ -12,9 +13,7 @@ import org.bukkit.scoreboard.DisplaySlot;
 import org.bukkit.scoreboard.Objective;
 import org.bukkit.scoreboard.Scoreboard;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 public class Team {
 
@@ -23,7 +22,7 @@ public class Team {
     public static void initScoreboardManager(Scoreboard sbm){
         BOARD = sbm;
     }
-
+    public Set<PlayerInfo> playerInfos;
 
     private static List<Team> TeamList = new ArrayList<Team>();
 
@@ -54,6 +53,7 @@ public class Team {
         obj.setDisplayName("§l점령한 타일");
 
         TeamList.clear();
+
     }
 
 
@@ -69,10 +69,15 @@ public class Team {
     public boolean cantRespawn;
     public boolean isSurvived;
     public int survivedPlayerNum;
+    public DataManager.TeamStats stats;
 
     public Team(TeamColor tc){
         this.tc = tc;
         this.tiles = new ArrayList<>();
+
+        stats = new DataManager.TeamStats(this);
+        playerInfos = new HashSet<>();
+
 
         isSurvived = true;
         cantRespawn =false;
@@ -136,12 +141,14 @@ public class Team {
             tiles.add(tile);
         tile.colorAll(this);
         BOARD.getObjective("tile").getScore(team.getColor() + team.getName()).setScore(tiles.size());
+        stats.add(DataManager.TeamStats.Stats.tiles,1);
     }
 
     public void removeTile(Tile tile){
         tiles.remove(tile);
         tile.colorAll(null);
         BOARD.getObjective("tile").getScore(team.getColor() + team.getName()).setScore(tiles.size());
+        stats.add(DataManager.TeamStats.Stats.tiles,-1);
     }
 
     private ItemStack color(Material mat){

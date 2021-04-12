@@ -1,15 +1,13 @@
 package jonjar.ftg.entity;
 
 import jonjar.ftg.FTG;
+import jonjar.ftg.file.DataManager;
 import jonjar.ftg.manager.GameManager;
 import jonjar.ftg.util.ContainerUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.boss.BarColor;
-import org.bukkit.boss.BarStyle;
-import org.bukkit.boss.BossBar;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -19,10 +17,7 @@ import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 
-import java.lang.reflect.Array;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.UUID;
 
 public class PlayerInfo {
@@ -52,24 +47,24 @@ public class PlayerInfo {
 
 
 
-    public PlayerStats stats;
+    public DataManager.PlayerStats stats;
 
     private Tile nowLocation;
 
 
     public PlayerInfo(String name, UUID uuid){
-        this.stats = new PlayerStats(this);
+        this.stats = new DataManager.PlayerStats(this);
         this.name = name;
         this.uuid = uuid;
         this.isDead = false;
         PlayerInfoList.put(name.toLowerCase(), this);
     }
     @Deprecated//수정하기 귀찮아서 일단 태그만 달아둠.
-    public int getKill(){ return (int) stats.stat_map.get(PlayerStats.Stats.kill); }
+    public int getKill(){ return (int) stats.stat_map.get(DataManager.PlayerStats.Stats.kill); }
     @Deprecated
-    public int getDeath() { return (int) stats.stat_map.get(PlayerStats.Stats.death); }
+    public int getDeath() { return (int) stats.stat_map.get(DataManager.PlayerStats.Stats.death); }
     @Deprecated
-    public int getTileAssisted() { return (int) stats.stat_map.get(PlayerStats.Stats.tile_assist); }
+    public int getTileAssisted() { return (int) stats.stat_map.get(DataManager.PlayerStats.Stats.tile_assist); }
 
     public Tile getNowLocation() { return this.nowLocation; }
     public String getName() { return this.name; }
@@ -176,6 +171,7 @@ public class PlayerInfo {
     public void leaveTeam(){
         if(team != null){
             team.removePlayer(uuid);
+            team.playerInfos.remove(this);
             team = null;
         }
     }
@@ -183,7 +179,9 @@ public class PlayerInfo {
     public void joinTeam(Team team){
         if(this.team != null)
             leaveTeam();
+
         team.addPlayer(uuid);
+        team.playerInfos.add(this);
         this.team = team;
 
         if(Bukkit.getPlayer(uuid) != null)
@@ -192,14 +190,14 @@ public class PlayerInfo {
 
     @Deprecated
     public void addKill(){
-        stats.add(PlayerStats.Stats.kill);
+        stats.add(DataManager.PlayerStats.Stats.kill);
     }
     @Deprecated
     public void addDeath(){
-        stats.add(PlayerStats.Stats.death);
+        stats.add(DataManager.PlayerStats.Stats.death);
     }
     @Deprecated
-    public void addTileAssisted() { stats.add(PlayerStats.Stats.tile_assist); }
+    public void addTileAssisted() { stats.add(DataManager.PlayerStats.Stats.tile_assist); }
     //public void capture
 
     public void equipKits(boolean reset){

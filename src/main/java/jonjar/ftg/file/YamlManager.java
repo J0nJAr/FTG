@@ -40,7 +40,7 @@ public abstract class YamlManager {
     }
     protected abstract void setDefault(YamlConfiguration yaml);
 
-    public FileConfiguration getYaml(){
+    public YamlConfiguration getYaml(){
         return yaml;
     }
 

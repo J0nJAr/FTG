@@ -4,6 +4,7 @@ import jonjar.ftg.entity.PlayerInfo;
 import jonjar.ftg.entity.Team;
 import jonjar.ftg.entity.Tile;
 import jonjar.ftg.file.ConfigManger;
+import jonjar.ftg.file.DataManager;
 import jonjar.ftg.file.YamlManager;
 import jonjar.ftg.manager.*;
 import org.bukkit.Bukkit;
@@ -45,6 +46,7 @@ public final class FTG extends JavaPlugin {
         */
 
         INSTANCE = this;
+        DataManager.loadInstance();
 
         world = Bukkit.getWorlds().get(0);
         Team.initScoreboardManager(Bukkit.getScoreboardManager().getMainScoreboard());

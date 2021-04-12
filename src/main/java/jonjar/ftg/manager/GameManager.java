@@ -4,6 +4,7 @@ import jonjar.ftg.FTG;
 import jonjar.ftg.entity.PlayerInfo;
 import jonjar.ftg.entity.Team;
 import jonjar.ftg.entity.Tile;
+import jonjar.ftg.file.ConfigManger;
 import jonjar.ftg.file.DataManager;
 import jonjar.ftg.file.YamlManager;
 import jonjar.ftg.util.ContainerUtil;
@@ -29,11 +30,7 @@ import java.util.HashSet;
 public class GameManager extends MsgSender {
 
     private final FTG plugin;
-    private YamlManager ym;
-
-    public FileConfiguration getYaml(){
-        return ym.getYaml();
-    }
+    public DataManager dm;
 
     public GameManager(FTG main){
         this.plugin = main;
@@ -80,7 +77,7 @@ public class GameManager extends MsgSender {
                     t.cantRespawn = false;
                 }
                 SimpleDateFormat format1 = new SimpleDateFormat ("yyyy_MM_dd_HH_mm_ss");
-                ym = new DataManager(format1.format(new Date()));
+                dm = new DataManager(format1.format(new Date()));
             } else {
                 error(p, "§c팀 배분을 받지 못한 플레이어가 있습니다.");
             }
@@ -98,12 +95,10 @@ public class GameManager extends MsgSender {
     }
 
     private void end(){
-        //TODO 등수를 이곳에 입력
-        for (String t : Team.TeamNames) {
-            ym.getYaml().set(t + ".place", "등수를 이곳에 입력");
-        }
-        PlayerInfo.PlayerInfoList.values().forEach(pi -> pi.stats.saveData());
-        ym.saveYaml();
+        dm.saveData();
+        dm.saveYaml();
+        dm.resetData();
+
         STATE = GameState.WAIT;
         runnable.cancel();
         runnable = null;
