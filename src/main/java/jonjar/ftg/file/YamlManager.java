@@ -24,11 +24,10 @@ public abstract class YamlManager {
         this.fromDefault = fromDefault;
         yamlFile = new File(fromDefault ? DEFAULT_PATH+path:path,name+".yml");
         yaml= YamlConfiguration.loadConfiguration(yamlFile);
+        loadYaml();
     }
 
     protected void loadYaml() {
-        yamlFile = new File(DEFAULT_PATH,name+".yml");
-        yaml= YamlConfiguration.loadConfiguration(yamlFile);
         try {
             if (!yamlFile.exists()) {
                 setDefault(yaml);

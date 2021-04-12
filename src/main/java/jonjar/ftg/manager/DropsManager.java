@@ -205,6 +205,10 @@ public class DropsManager {
 
 
     public static void load(){
+        dropsMap.clear();
+        Drop.count = 0;
+        DropsManager.Sum_modifier = 0;
+
         Location loc1 = new Location(FTG.world,-22,8,1);
         Location loc2 = new Location(FTG.world,-22,8,4);
 
