@@ -193,6 +193,8 @@ public class GameManager extends MsgSender {
         public final Random rn;
 
         private int drops_now = 0;
+        private int drops_tick = 0;
+
 
         public GameManagerTask(){
             this.rn = new Random();
@@ -204,7 +206,9 @@ public class GameManager extends MsgSender {
                 return;
 
             // 보급
-            if(elapsed_tick % DROPS_TEMP == 0){
+            drops_tick++;
+            if(drops_tick == DROPS_TEMP){
+                drops_tick = 0;
                 int increase = rn.nextInt(6) + 2; // 2~7
                 drops_now += increase;
                 if(drops_now >= 100){

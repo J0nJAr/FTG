@@ -34,7 +34,7 @@ public class Tile {
 
 
     public static final Location LOCATION_0 =  new Location(FTG.world,153D,5D,-52D);
-    public static final float DOMINATE_RATIO = 0.01F;
+    public static final float DOMINATE_RATIO = 0.03F;
 
     private ArrayList<Set<Tile>> nearTileList; //거리별 타일
     private HashMap<Tile,Integer> tileDistanceList;//타일별 거리
@@ -55,6 +55,8 @@ public class Tile {
     private Team attempt;
     private boolean isMasterTile;
 
+    private Block dropsBlock;
+
     //
     private HashMap<Team.TeamColor, Float> progress;
 
@@ -62,8 +64,10 @@ public class Tile {
 
     Tile(Location center, int x_index, int y_index){
         this.center = center;
+        this.dropsBlock = center.getBlock().getRelative(BlockFace.UP);
         this.x_index=x_index;
         this.z_index=y_index;
+
 
         this.bar = Bukkit.createBossBar("", BarColor.GREEN, BarStyle.SOLID);
 
@@ -252,6 +256,7 @@ public class Tile {
     public void resetInfo(){
         isMasterTile = false;
         PlayerList.clear();
+        dropsBlock.setType(Material.AIR);
         for(Team.TeamColor tc : Team.TeamColor.values()){
             progress.put(tc, 0F);
         }
@@ -450,6 +455,9 @@ public class Tile {
     public Location getCenter(){
         return center;
     }
+    public Block getDropsBlock(){
+        return dropsBlock;
+    }
 
     public static void registerTiles(){
         final int distance = RADIUS*2-1;
@@ -583,6 +591,7 @@ public class Tile {
                 processOccupation(t, dom.get(t));
                 bar.setTitle(t.getColor().getKoreanName() + " 점령 중...");
                 bar.setProgress(progress.get(t.getColor()));
+                bar.setColor(t.getColor().getBarColor());
             } else {
                 if(flag_colored){
                     colorTeams(teams.toArray(new Team[0]));

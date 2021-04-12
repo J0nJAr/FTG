@@ -214,15 +214,16 @@ public class DropsManager {
         Drop drop = getRandomDrop();
         if(drop == null) return;
 
-        Location loc = tile.getCenter().clone().add(0, 1, 0);
         // CHECK : macham.do("비주얼");
-        Block b = loc.getBlock();
+        Block b = tile.getDropsBlock();
         b.setType(Material.CHEST);
 
         Chest c = (Chest) b.getState();
         Inventory inv = c.getInventory();
-        inv.setContents(drop.inventory.getContents());
-        c.update(true);
+
+        for(int i=0;i<27;i++){
+            inv.setItem(i, drop.inventory.getItem(i));
+        }
     }
 
 
