@@ -214,7 +214,7 @@ public class DropsManager {
         if(tile == null) return;
 
         Location loc = tile.getDropsBlock().getLocation().add(0, 50, 0);
-        FallingBlock fb = (FallingBlock) loc.getWorld().spawnFallingBlock(loc, Material.CHEST, (byte) 0);
+        FallingBlock fb = loc.getWorld().spawnFallingBlock(loc, Material.CHEST, (byte) 0);
         fb.setDropItem(false);
         fb.setHurtEntities(false);
         fb.setGlowing(true);
@@ -223,14 +223,12 @@ public class DropsManager {
     }
 
     public static void onDropsFall(FallingBlock fb){
-        Tile tile = Tile.TILE_MAP.getRandomEmptyTile();
-        if(tile == null) return;
 
         Drop drop = getRandomDrop();
         if(drop == null) return;
 
         // CHECK : macham.do("비주얼");
-        Block b = tile.getDropsBlock();
+        Block b = fb.getLocation().getBlock();
         b.setType(Material.CHEST);
         spawnedDrops.add(b.getLocation());
 
