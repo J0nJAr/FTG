@@ -34,7 +34,7 @@ public class ConfigManger extends YamlManager{
         drops("drops_temp", 10),
         time("time",320),
         fever("fever",1),
-        particle("particle", 5);
+        particle("particle", 15);
 
         String path;
         int default_value;

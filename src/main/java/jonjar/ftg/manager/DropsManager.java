@@ -214,8 +214,8 @@ public class DropsManager {
         Tile tile = Tile.TILE_MAP.getRandomEmptyTile();
         if(tile == null) return;
 
-        Location loc = tile.getDropsBlock().getLocation().add(0, 50, 0);
-        FallingBlock fb = loc.getWorld().spawnFallingBlock(loc, Material.CHEST, (byte) 0);
+        Location loc = tile.getDropsBlock().getLocation().add(0.5, 50, 0.5);
+        FallingBlock fb = loc.getWorld().spawnFallingBlock(loc, Material.WOOD, (byte) 0);
         fb.setDropItem(false);
         fb.setHurtEntities(false);
         fb.setGlowing(true);

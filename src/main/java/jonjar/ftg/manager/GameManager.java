@@ -220,7 +220,7 @@ public class GameManager extends MsgSender {
                 for (Location l : DropsManager.spawnedDrops) {// CHECK : 비주얼자리 더 나은 파티클 생각 좀 해주셈.
                     for (int i = 0; i < PARTICLE; i++) {
                         FTG.world.spawnParticle(Particle.SPELL_MOB,
-                                l.clone().add((rn.nextInt(10)) / 10D, 0, (rn.nextInt(10)) / 10D)
+                                l.clone().add((rn.nextInt(100)) / 100D, 0, (rn.nextInt(100)) / 100D)
                                 , 0, 0 / 255D, 255 / 255D, 0 / 255D, 1);
                     }
                 }
