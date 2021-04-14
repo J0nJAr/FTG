@@ -1,5 +1,6 @@
 package jonjar.ftg.file;
 
+import jonjar.ftg.FTG;
 import org.bukkit.configuration.file.YamlConfiguration;
 
 import java.io.File;
@@ -22,23 +23,27 @@ public class ConfigManger extends YamlManager{
         for(SETTINGS setting :SETTINGS.values()){
             yaml.set(setting.path,setting.default_value);
         }
+
     }
 
-    public Integer getSetting(SETTINGS setting){
+    public Integer getIntSetting(SETTINGS setting){
         return getYaml().getInt(setting.path);
     }
 
     public enum SETTINGS{
         drops("drops_temp", 10),
         time("time",320),
-        fever("fever",1);
+        fever("fever",1),
+        particle("particle", 5);
 
         String path;
         int default_value;
+
 
         SETTINGS(String path,int default_value){
             this.path=path;
             this.default_value = default_value;
         }
+
     }
 }

@@ -42,7 +42,7 @@ public class DataManager extends YamlManager{
         }
     }
 
-    private static abstract class AbstractStats <E extends Enum<E>>{
+    private static abstract class AbstractStats {
 
         protected AbstractStats(){
         }

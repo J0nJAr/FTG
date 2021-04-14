@@ -4,16 +4,14 @@ import jonjar.ftg.FTG;
 import jonjar.ftg.entity.Tile;
 import jonjar.ftg.util.ContainerUtil;
 import jonjar.ftg.util.MsgSender;
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-import org.bukkit.Location;
-import org.bukkit.Material;
+import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.block.Chest;
 import org.bukkit.block.ShulkerBox;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventException;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.BlockStateMeta;
@@ -207,6 +205,8 @@ public class DropsManager {
         return null;
     }
 
+    public static HashSet<Location> spawnedDrops = new HashSet<>();
+
     public static void spawnRandomDrop(){
         Tile tile = Tile.TILE_MAP.getRandomEmptyTile();
         if(tile == null) return;
@@ -217,6 +217,7 @@ public class DropsManager {
         // CHECK : macham.do("비주얼");
         Block b = tile.getDropsBlock();
         b.setType(Material.CHEST);
+        spawnedDrops.add(b.getLocation());
 
         Chest c = (Chest) b.getState();
         Inventory inv = c.getInventory();
@@ -224,6 +225,18 @@ public class DropsManager {
         for(int i=0;i<27;i++){
             inv.setItem(i, drop.inventory.getItem(i));
         }
+    }
+
+    public static boolean removeSpawnedDrop(InventoryCloseEvent event){
+        Inventory inventory = event.getInventory();
+        Location location = inventory.getLocation();
+        if(spawnedDrops.contains(location)){//보급 위치임
+            if(ContainerUtil.isInvEmpty(inventory.getContents())){//보급이 비어있음
+                location.getBlock().setType(Material.AIR);
+            }
+            return true;
+        }
+        return false;
     }
 
 

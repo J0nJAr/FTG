@@ -48,6 +48,15 @@ public class ContainerUtil {
         setInventory(p,c.getInventory());
     }
 
+    public static boolean isInvEmpty(ItemStack[] itemStacks) {
+        for (ItemStack item : itemStacks) {
+            if (item != null) {
+                return false;
+            }
+        }
+        return true;
+    }
+
     public static void setInventory(Player p, Inventory inv){
        // if(!(b instanceof Chest)) return;
         PlayerInventory pi = p.getInventory();

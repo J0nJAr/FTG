@@ -13,12 +13,11 @@ import org.bukkit.entity.Projectile;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.block.BlockFormEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
-import org.bukkit.event.entity.EntityDamageEvent;
-import org.bukkit.event.entity.FoodLevelChangeEvent;
-import org.bukkit.event.entity.PlayerDeathEvent;
+import org.bukkit.event.entity.*;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.player.*;
 
 public class EventManager implements Listener {
@@ -87,6 +86,16 @@ public class EventManager implements Listener {
         if(pi == null){
             new PlayerInfo(p.getName(), p.getUniqueId());
         }
+    }
+
+    @EventHandler
+    public void onFalling(EntityChangeBlockEvent event){
+
+    }
+    @EventHandler
+    public void onInventoryClose(InventoryCloseEvent event){
+        if(DropsManager.removeSpawnedDrop(event)) return; //발동되면 아래 무시.
+
     }
 
     @EventHandler

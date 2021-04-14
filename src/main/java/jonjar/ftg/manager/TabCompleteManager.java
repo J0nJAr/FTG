@@ -16,7 +16,7 @@ import java.util.List;
 
 public class TabCompleteManager implements TabCompleter {
 
-    public TabCompleteManager(FTG ftg) {
+    public TabCompleteManager() {
         super();
     }
 

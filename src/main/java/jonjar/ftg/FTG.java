@@ -52,7 +52,7 @@ public final class FTG extends JavaPlugin {
         cm = new CommandManager(this);
         gm = new GameManager(this);
         em = new EventManager(this);
-        tcm = new TabCompleteManager(this);
+        tcm = new TabCompleteManager();
         config = new ConfigManger();
 
         Tile.registerTiles();
