@@ -11,6 +11,7 @@ import org.bukkit.block.ShulkerBox;
 import org.bukkit.entity.FallingBlock;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventException;
+import org.bukkit.event.entity.EntityChangeBlockEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.inventory.Inventory;
@@ -248,6 +249,7 @@ public class DropsManager {
         if(spawnedDrops.contains(location)){//보급 위치임
             if(ContainerUtil.isInvEmpty(inventory.getContents())){//보급이 비어있음
                 location.getBlock().setType(Material.AIR);
+                spawnedDrops.remove(location);
             }
             return true;
         }
