@@ -13,7 +13,6 @@ public abstract class YamlManager {
     private File yamlFile;
     private YamlConfiguration yaml;
     private final String name;
-    private final boolean fromDefault;
     private final String DEFAULT_PATH = "plugins/FTG/";
 
     public YamlManager(String name){
@@ -21,10 +20,14 @@ public abstract class YamlManager {
     }
     public YamlManager(String path, String name,boolean fromDefault){
         this.name = name;
-        this.fromDefault = fromDefault;
         yamlFile = new File(fromDefault ? DEFAULT_PATH+path:path,name+".yml");
         yaml= YamlConfiguration.loadConfiguration(yamlFile);
         loadYaml();
+    }
+    public YamlManager(File file){
+        name = file.getName();
+        yamlFile = file;
+        yaml= YamlConfiguration.loadConfiguration(yamlFile);
     }
 
     protected void loadYaml() {

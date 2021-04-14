@@ -6,6 +6,7 @@ import jonjar.ftg.entity.Team;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.YamlConfiguration;
 
+import java.io.File;
 import java.util.EnumMap;
 import java.util.logging.Level;
 
@@ -15,6 +16,9 @@ public class DataManager extends YamlManager{
 
     public DataManager(String name) {
         super("GAMEDATA", name, true);
+    }
+    public DataManager(File file) {
+        super(file);
     }
 
     @Override
