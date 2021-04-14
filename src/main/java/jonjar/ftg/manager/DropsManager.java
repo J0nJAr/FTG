@@ -8,6 +8,7 @@ import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.block.Chest;
 import org.bukkit.block.ShulkerBox;
+import org.bukkit.entity.FallingBlock;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventException;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -206,8 +207,22 @@ public class DropsManager {
     }
 
     public static HashSet<Location> spawnedDrops = new HashSet<>();
+    public static HashSet<Integer> spawnedFallingDrops = new HashSet<>();
 
     public static void spawnRandomDrop(){
+        Tile tile = Tile.TILE_MAP.getRandomEmptyTile();
+        if(tile == null) return;
+
+        Location loc = tile.getDropsBlock().getLocation().add(0, 50, 0);
+        FallingBlock fb = (FallingBlock) loc.getWorld().spawnFallingBlock(loc, Material.CHEST, (byte) 0);
+        fb.setDropItem(false);
+        fb.setHurtEntities(false);
+        fb.setGlowing(true);
+
+        spawnedFallingDrops.add(fb.getEntityId());
+    }
+
+    public static void onDropsFall(FallingBlock fb){
         Tile tile = Tile.TILE_MAP.getRandomEmptyTile();
         if(tile == null) return;
 

@@ -181,7 +181,7 @@ public class PlayerInfo {
 
     public void leaveTeam(){
         if(team != null){
-            team.removePlayer(uuid);
+            team.removePlayer(name);
             team.playerInfos.remove(this);
             team = null;
         }
@@ -191,7 +191,7 @@ public class PlayerInfo {
         if(this.team != null)
             leaveTeam();
 
-        team.addPlayer(uuid);
+        team.addPlayer(name);
         team.playerInfos.add(this);
         this.team = team;
 

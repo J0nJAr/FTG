@@ -6,6 +6,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.Color;
 import org.bukkit.Material;
 import org.bukkit.boss.BarColor;
+import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.LeatherArmorMeta;
@@ -107,7 +108,6 @@ public class Team {
         team.setAllowFriendlyFire(false);
         team.setOption(org.bukkit.scoreboard.Team.Option.COLLISION_RULE, org.bukkit.scoreboard.Team.OptionStatus.NEVER);
         team.setCanSeeFriendlyInvisibles(true);
-        team.setPrefix(tc.getChatColor() + "");
         team.setColor(tc.getChatColor());
 
         Scoreboard sc = Bukkit.getScoreboardManager().getMainScoreboard();
@@ -126,14 +126,14 @@ public class Team {
         return team;
     }
 
-    public void addPlayer(UUID uuid){
-        if(!team.hasEntry(uuid.toString()))
-            team.addEntry(uuid.toString());
+    public void addPlayer(String name){
+        if(!team.hasEntry(name))
+            team.addEntry(name);
     }
 
-    public void removePlayer(UUID uuid){
-        if(team.hasEntry(uuid.toString()))
-            team.addEntry(uuid.toString());
+    public void removePlayer(String name){
+        if(team.hasEntry(name))
+            team.addEntry(name);
     }
 
     public void addTile(Tile tile){

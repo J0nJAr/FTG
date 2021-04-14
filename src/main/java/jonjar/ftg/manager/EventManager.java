@@ -8,6 +8,8 @@ import jonjar.ftg.util.LocationUtil;
 import jonjar.ftg.util.MsgSender;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.FallingBlock;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
 import org.bukkit.event.EventHandler;
@@ -30,7 +32,7 @@ public class EventManager implements Listener {
         main = plugin;
     }
 
-
+    // TODO  : 보급상자 클릭하면 아시죠?
     @EventHandler
     public void onBreak(BlockBreakEvent event){
         Player p = event.getPlayer();
@@ -90,8 +92,17 @@ public class EventManager implements Listener {
 
     @EventHandler
     public void onFalling(EntityChangeBlockEvent event){
-
+        if(event.getEntity() instanceof FallingBlock){
+            FallingBlock fb = (FallingBlock) event.getEntity();
+            if(DropsManager.spawnedFallingDrops.contains(fb.getEntityId())){
+                DropsManager.spawnedFallingDrops.remove(fb.getEntityId());
+                DropsManager.onDropsFall(fb);
+                event.setCancelled(true);
+                fb.remove();
+            }
+         }
     }
+
     @EventHandler
     public void onInventoryClose(InventoryCloseEvent event){
         if(DropsManager.removeSpawnedDrop(event)) return; //발동되면 아래 무시.
