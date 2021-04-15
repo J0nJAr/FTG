@@ -8,7 +8,7 @@ import org.bukkit.configuration.file.YamlConfiguration;
 
 import java.io.File;
 import java.util.EnumMap;
-import java.util.logging.Level;
+
 
 public class DataManager extends YamlManager{
     public static void loadInstance(){
@@ -74,7 +74,7 @@ public class DataManager extends YamlManager{
         @Override
         public void saveData(YamlConfiguration data){
             for(Stats stats :Stats.values()){
-                data.set(team.toString()+stats, stat_map.get(stats));
+                data.set("."+team.toString()+stats, stat_map.get(stats));
             }
         }
 
