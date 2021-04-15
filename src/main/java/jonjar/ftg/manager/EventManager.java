@@ -105,7 +105,7 @@ public class EventManager implements Listener {
 
     @EventHandler
     public void onInventoryClose(InventoryCloseEvent event){
-        if(DropsManager.removeSpawnedDrop(event)) return; //발동되면 아래 무시.
+        if(DropsManager.removeSpawnedDrop(event)) return;
 
     }
 

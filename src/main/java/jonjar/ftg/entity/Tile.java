@@ -7,6 +7,7 @@ import org.bukkit.Bukkit;
 
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.Sound;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.boss.BarColor;
@@ -159,6 +160,31 @@ public class Tile {
         progress.put(tc, now);
     }
 
+    private void onMasterTileOccupied(Team t, List<Player> players){
+
+        isMasterTile = false;
+
+        if(own == null) return;
+
+        Team cut = own;
+
+        for(String member : cut.getTeam().getEntries()){
+            PlayerInfo pi = PlayerInfo.getPlayerInfo(member);
+            pi.onDeath();
+        }
+        cut.isSurvived = false;
+        own.removeAllTiles();
+
+        Player p = players.get(0);
+        String sub = PlayerInfo.getPlayerInfo(p).getTeam().getColor().getChatColor() + p.getName() + "§f님이 마스터 타일을 점령하셨습니다!";
+
+        for(Player ap : Bukkit.getOnlinePlayers()){
+            ap.playSound(ap.getLocation(), Sound.ENTITY_WITHER_DEATH, 1.0F, 1.0F);
+            ap.sendTitle(cut.getColor().getKoreanName() + " §c§l탈락!", sub, 20, 60, 20);
+        }
+
+    }
+
     public void processOccupation(Team t, int n){
 
         float amount = DOMINATE_RATIO + ((n-1) * DOMINATE_RATIO / 2F);
@@ -174,9 +200,16 @@ public class Tile {
             modifyProgress(t.getColor(), amount);
             if(progress.get(t.getColor()) >= 1.0F){
                 // 점령!
+                List<Player> players = PlayerList.get(t);
+
                 for(Team.TeamColor key : progress.keySet()){
                     if(t.getColor() != key)
                         progress.put(key, 0F);
+                }
+
+                if(isMasterTile){
+                    // 마스터 타일 점령 시
+                    onMasterTileOccupied(t, players); // CHECK: 테스트 해볼 것
                 }
 
                 if(own != null){
@@ -184,7 +217,7 @@ public class Tile {
                 }
 
                 own = t;
-                List<Player> players = PlayerList.get(t);
+
                 for(Player ap : players){
                     PlayerInfo pi = PlayerInfo.getPlayerInfo(ap);
                     pi.addTileAssisted();
@@ -197,56 +230,6 @@ public class Tile {
             }
             runnable.flag_colored = false;
         }
-
-        /*
-        if(own != null && own == t){
-            if(state_tick > 0) state_tick--;
-            return;
-        } else {
-            if(attempt != null && attempt == t)
-                state_tick++;
-            else {
-                state_tick = 0;
-                attempt = t;
-                // 색깔 바뀌게.
-                if(own == null)
-                    colorAll(attempt, true);
-                else
-                    colorAll(own, true);
-            }
-        }
-
-
-
-        if(state_tick == NEED_DOMINATE_TICK){
-            // 점령
-            attempt = null;
-            state_tick = 0;
-            if(own != null) {
-                own.removeTile(this);
-                own = null;
-            } else {
-                List<Player> players = PlayerList.get(t);
-                for(Player ap : players){
-                    PlayerInfo pi = PlayerInfo.getPlayerInfo(ap);
-                    pi.addTileAssisted();
-                }
-                own = t;
-                t.addTile(this);
-
-            }
-        }
-
-        /*
-        int size = need_occupied_block.size();
-        Random rn = new Random();
-
-        if(size == 0){
-            // 점령 끝
-            own =
-        }
-        int r = rn.nextInt(size);
-        */
     }
 
     public void resetInfo(){

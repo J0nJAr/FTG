@@ -152,6 +152,15 @@ public class Team {
         stats.add(DataManager.TeamStats.Stats.tiles,-1);
     }
 
+    public void removeAllTiles(){
+        for(Tile tile : tiles){
+            tile.colorAll(null);
+            BOARD.getObjective("tile").getScore(team.getColor() + team.getName()).setScore(tiles.size());
+            stats.add(DataManager.TeamStats.Stats.tiles,-1);
+        }
+        tiles.clear();
+    }
+
     private ItemStack color(Material mat){
         ItemStack is = new ItemStack(mat);
         LeatherArmorMeta lam = (LeatherArmorMeta) is.getItemMeta();

@@ -290,8 +290,8 @@ public class GameManager extends MsgSender {
                                             pi.getTeam().survivedPlayerNum++;
                                         }
                                     } else {//동률이 아닌 플레이어들 사망처리.
-                                        for (String UUID : t.getTeam().getEntries()) { //플레이어들을 뽑는다
-                                            PlayerInfo pi = PlayerInfo.getPlayerInfoByUUID(UUID);
+                                        for (String name : t.getTeam().getEntries()) { //플레이어들을 뽑는다
+                                            PlayerInfo pi = PlayerInfo.getPlayerInfo(name);
                                             pi.onDeath();
                                         }
 

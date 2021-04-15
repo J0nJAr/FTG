@@ -214,8 +214,8 @@ public class DropsManager {
         Tile tile = Tile.TILE_MAP.getRandomEmptyTile();
         if(tile == null) return;
 
-        Location loc = tile.getDropsBlock().getLocation().add(0.5, 50, 0.5);
-        FallingBlock fb = loc.getWorld().spawnFallingBlock(loc, Material.WOOD, (byte) 0);
+        Location loc = tile.getDropsBlock().getLocation().add(0.5D, 50, 0.5D);
+        FallingBlock fb = loc.getWorld().spawnFallingBlock(loc, Material.CHEST, (byte) 0);
         fb.setDropItem(false);
         fb.setHurtEntities(false);
         fb.setGlowing(true);
@@ -247,7 +247,6 @@ public class DropsManager {
         if(spawnedDrops.contains(location)){//보급 위치임
             if(ContainerUtil.isInvEmpty(inventory.getContents())){//보급이 비어있음
                 location.getBlock().setType(Material.AIR);
-                spawnedDrops.remove(location);
             }
             return true;
         }
