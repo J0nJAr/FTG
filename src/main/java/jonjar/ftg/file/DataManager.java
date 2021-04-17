@@ -77,10 +77,13 @@ public class DataManager extends YamlManager{
                 data.set("."+team.toString()+stats, stat_map.get(stats));
             }
         }
-
+        public void set(Stats stat, int i){
+            stat_map.put(stat,i);
+        }
         public void add(Stats stat, int i){
             stat_map.put(stat,(int)stat_map.get(stat)+i);
         }
+
         public enum Stats {
             place, tiles;
         }

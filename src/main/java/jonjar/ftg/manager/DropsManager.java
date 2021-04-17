@@ -7,16 +7,12 @@ import jonjar.ftg.util.MsgSender;
 import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.block.Chest;
-import org.bukkit.block.ShulkerBox;
 import org.bukkit.entity.FallingBlock;
 import org.bukkit.entity.Player;
-import org.bukkit.event.EventException;
-import org.bukkit.event.entity.EntityChangeBlockEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.BlockStateMeta;
 import org.bukkit.inventory.meta.ItemMeta;
 
 import java.util.*;
@@ -36,9 +32,6 @@ public class DropsManager {
         CONFIRM_GUI.setItem(4,is);
     }
     private static boolean delete = false;
-
-    public static int Sum_modifier = 0;
-
 
 
     public static void openGUI(Player p){
@@ -189,11 +182,11 @@ public class DropsManager {
 
     public static Drop getRandomDrop(){
         Random random = new Random();
-        if(Sum_modifier == 0 ) {
+        if(Drop.Sum_modifier == 0 ) {
             MsgSender.getMsgSender().broadcast("설정된 보급이 없어 비어있는 보급을 생성했습니다.");
             return new Drop();
         }
-        int value = 1+random.nextInt(Sum_modifier);//
+        int value = 1+random.nextInt(Drop.Sum_modifier);//
 
         for(Drop drop : dropsMap.values()) {
             if (drop.modifier >= value) {
@@ -257,7 +250,7 @@ public class DropsManager {
     public static void load(){
         dropsMap.clear();
         Drop.count = 0;
-        DropsManager.Sum_modifier = 0;
+        Drop.Sum_modifier = 0;
 
         Location loc1 = new Location(FTG.world,-22,8,1);
         Location loc2 = new Location(FTG.world,-22,8,4);
@@ -312,11 +305,14 @@ public class DropsManager {
 
 
     public static class Drop{
+        public static int Sum_modifier = 0;
+        private int modifier; //확률 관련 정수(경우의 수 느낌)
+
         private static int count = 0;//gui 이름 구분을 위한 숫자
         private static SortedSet<Integer> blank = new TreeSet<>();
         private final int id; //고유 id
 
-        private int modifier; //확률 관련 정수(경우의 수 느낌)
+
         public Inventory inventory;
 
 
@@ -331,7 +327,7 @@ public class DropsManager {
             Sum_modifier+=this.modifier;
 
             if(blank.isEmpty()) {
-                if(count>=10*45) throw new IllegalStateException();
+                if(count>=10*45) throw new IllegalStateException("최대 숫자를 넘김.");
                 id = count;
                 count++;
             }else {
